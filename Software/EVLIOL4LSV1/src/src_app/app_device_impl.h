@@ -1,0 +1,29 @@
+#ifndef APP_DEVICE_IMPL_H
+#define APP_DEVICE_IMPL_H
+
+#include <stdint.h>
+
+#include "clk.h"
+#include "Systick_delay.h"
+#include "spi.h"
+
+#include "iol_l6364.h"
+
+#include "iol_pl.h"
+#include "iol_dl.h"
+
+#define F_CPU		64000000UL
+
+
+enum APP_FSM_STATEs{
+	APP_INIT_STATE = 0,
+	APP_WAIT_WU,
+	APP_GET_PREOP,
+	APP_PROC_PREOP,
+};
+
+
+void app_initIO();
+void app_runner();
+
+#endif
