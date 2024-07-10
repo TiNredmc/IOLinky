@@ -2,7 +2,6 @@
 #define IOL_PL_H
 
 #include <stdint.h>
-
 #include "iol_l6364.h"
 
 enum current_mtype_e{

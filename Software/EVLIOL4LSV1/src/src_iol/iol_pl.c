@@ -30,17 +30,17 @@ void iol_pl_init(
 }
 	
 void iol_pl_aliveLED(){
-	if(alive_led > 0x0F){
+	if(alive_led > 0x04){
 		alive_led--;
 		if(alive_led == 0x10)
 			alive_led = 0;
 	}else{
 		alive_led++;
-		if(alive_led == 0x0F)
-			alive_led = 0x1F;
+		if(alive_led == 0x04)
+			alive_led = 0x14;
 	}
 	
-	l6364_setLED1(alive_led & 0x0F);
+	l6364_setLED2(alive_led & 0x0F);
 }
 
 void iol_pl_poll(){
