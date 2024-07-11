@@ -34,7 +34,7 @@ void spi_read(uint8_t *data, size_t len){
 
 			case 1:// Wait for RX data
 			{
-				if((SPI1->SR & (3 << 9)) != 0){
+				if((SPI1->SR & SPI_SR_RXNE) != 0){
 					spi_fsm = 2;
 				}
 			}
@@ -84,7 +84,7 @@ void spi_Write(uint8_t *data, size_t len){
 
 			case 1:// Wait for RX data
 			{
-				if((SPI1->SR & (3 << 9)) != 0){
+				if((SPI1->SR & SPI_SR_RXNE) != 0){
 					spi_fsm = 2;
 				}
 			}
@@ -136,7 +136,7 @@ void spi_WriteAndRead(
 
 			case 1:// Wait for RX data
 			{
-				if((SPI1->SR & (3 << 9)) != 0){
+				if((SPI1->SR & SPI_SR_RXNE) != 0){
 					spi_fsm = 2;
 				}
 			}
@@ -194,7 +194,7 @@ void spi_WriteOnceAndRead(
 			
 			case 1:// Wait for RX data
 			{
-				if((SPI1->SR & (3 << 9)) != 0){
+				if((SPI1->SR & SPI_SR_RXNE) != 0){
 					spi_fsm = 2;
 				}
 			}
@@ -252,7 +252,7 @@ void spi_WriteOnceAndWrite(
 
 			case 1:// Wait for RX data
 			{
-				if((SPI1->SR & (3 << 9)) != 0){
+				if((SPI1->SR & SPI_SR_RXNE) != 0){
 					spi_fsm = 2;
 				}
 			}
