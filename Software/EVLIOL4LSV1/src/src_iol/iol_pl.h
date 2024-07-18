@@ -22,7 +22,8 @@ void iol_pl_updateBuffer(
 	uint8_t *wr_buffer_ptr
 	);
 
-void iol_pl_aliveLED();
+void iol_pl_standbyLED();
+void iol_pl_connectedLED();
 void iol_pl_pollRead();
 void iol_pl_pollWrite();
 

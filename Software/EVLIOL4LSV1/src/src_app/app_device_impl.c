@@ -73,10 +73,33 @@ void app_initIO(){
 }
 
 uint32_t led_millis = 0;
+uint8_t alive_fsm = 0;
 void app_iol_aliveTask(){
+	
 	if((millis() - led_millis) > 100){
 		led_millis = millis();
-		iol_pl_aliveLED();
+		switch(alive_fsm){
+			case 0:
+				{
+					iol_pl_standbyLED();
+					if(iol_dl_getModeStatus() == DL_MODE_OP){
+						l6364_setLED2(0x00);// Red LED off
+						alive_fsm = 1;
+					}
+				}
+				break;
+				
+			case 1:
+				{
+					iol_pl_connectedLED();
+					if(iol_dl_getModeStatus() != DL_MODE_OP){
+						l6364_setLED1(0x00);// Green LED off
+						alive_fsm = 0;
+					}
+				}
+				break;
+		}
+		
 	}
 }
 

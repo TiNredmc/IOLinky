@@ -25,8 +25,8 @@ void iol_pl_init(
 		
 	l6364_setIOLmode();// Put chip into IO-Link mode
 	l6364_setCOM(COM2);// COM2 mode	
-	l6364_setLED1(0x00);	
-	l6364_setLED2(0x00);
+	l6364_setLED1(0x00);// Green LED off
+	l6364_setLED2(0x00);// Red LED off
 		
 	// Startup with Type-0 to detect wakeup sequence
 	iol_pl_setMtype0();
@@ -48,7 +48,21 @@ void iol_pl_updateBuffer(
 	write_buffer_ptr = wr_buffer_ptr;
 }
 
-void iol_pl_aliveLED(){
+void iol_pl_standbyLED(){// Red LED
+	if(alive_led > 0x08){
+		alive_led--;
+		if(alive_led == 0x10)
+			alive_led = 0;
+	}else{
+		alive_led++;
+		if(alive_led == 0x08)
+			alive_led = 0x18;
+	}
+	
+	l6364_setLED2(alive_led & 0x0F);
+}
+
+void iol_pl_connectedLED(){// Green LED
 	if(alive_led > 0x08){
 		alive_led--;
 		if(alive_led == 0x10)
