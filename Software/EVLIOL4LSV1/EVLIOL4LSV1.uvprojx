@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -502,7 +502,7 @@
             <File>
               <FileName>iol_sm.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\iol_sm.h</FilePath>
+              <FilePath>.\src\src_iol\iol_sm.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -551,5 +551,14 @@
       </file>
     </files>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>EVLIOL4LSV1</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>
