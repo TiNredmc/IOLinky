@@ -17,8 +17,6 @@ uint8_t master_cycle = 0;
 
 void iol_dl_modeHandler();
 
-uint8_t isdu_attempt_cnt = 0;
-
 void iol_dl_handleSTARTUP();
 void iol_dl_T0WritePage(uint8_t address);
 void iol_dl_T0ReadPage(uint8_t address);
@@ -192,7 +190,7 @@ void iol_dl_T0WritePage(uint8_t address){
 		}	
 		iol_pl_update_WriteBuffer(&iol_mt0.CKS);
 		iol_mt0.CKS = 0x00;
-		iol_pl_WriteRequest(1);// Return Type 0 test message reply
+		iol_pl_WriteRequest(1);// Return Type 0 message reply
 }
 
 void iol_dl_T0ReadPage(uint8_t address){
@@ -261,7 +259,7 @@ void iol_dl_T0ReadPage(uint8_t address){
 	
 	iol_mt0.CKS = 0x00;
 	
-	iol_pl_WriteRequest(2);// Return Type 0 test message reply
+	iol_pl_WriteRequest(2);// Return Type 0 message reply
 }
 
 uint8_t ISDU_data_pointer = 0;
@@ -285,7 +283,7 @@ void iol_dl_T0WriteISDU(uint8_t address){
 reply_cks:
 	iol_pl_update_WriteBuffer(&iol_mt0.CKS);
 	iol_mt0.CKS = 0x00;
-	iol_pl_WriteRequest(1);// Return Type 0 test message reply
+	iol_pl_WriteRequest(1);// Return Type 0 message reply
 }
 
 uint8_t prev_FlowCTRL = 0;
@@ -295,8 +293,6 @@ void iol_dl_T0ReadISDU(uint8_t address){
 		// No FlowCTRL Address change
 		// NACK to let master resend
 	}	
-	
-	isdu_attempt_cnt++;
 
 	// Grab the M-seq count
 	if(address < 0x10){
@@ -305,16 +301,13 @@ void iol_dl_T0ReadISDU(uint8_t address){
 	
 	switch(address){
 		case 0x10:// FlowCTRL START, send read respond I-service
-				iol_mt0.OD = 0xD0 | (1);// I-service is Read response(+) and the data length is
+			iol_mt0.OD = 0xD0 | (1);// I-service is Read response(+) and the data length is 1 (arbitrary num for testing)
 			break;
 		
 		case 0x11:// FlowCTRL IDLE1
 			// Reply with OD = 0x00
-			GPIOB->ODR |= (1 << IOL_mon);
 			iol_mt0.OD = 0x00;
-			iol_mt0.CKS = 0x00;
-			iol_pl_WriteRequest(2);// Return Type 0 test message reply
-			goto exit_t0isdu_ja;
+			break;
 		
 		case 0x1F:// FlowCTRL ABORT
 			break;
@@ -326,7 +319,7 @@ void iol_dl_T0ReadISDU(uint8_t address){
 	
 	iol_pl_update_WriteBuffer(&iol_mt0.CKS);
 	iol_mt0.CKS = 0x00;
-	iol_pl_WriteRequest(1);// Return Type 0 test message reply
+	iol_pl_WriteRequest(2);// Return Type 0 message reply
 
 exit_t0isdu_ja:
 	prev_FlowCTRL = address;
@@ -399,9 +392,49 @@ void iol_dl_handleOPERATE(){
 }
 
 void iol_dl_T12ReadISDU(uint8_t address){
+		if(prev_FlowCTRL == address){
+		// No FlowCTRL Address change
+		// NACK to let master resend
+	}	
 
+	// Grab the M-seq count
+	if(address < 0x10){
+		ISDU_FC_count = address;
+	}
+	
+	switch(address){
+		case 0x10:// FlowCTRL START, send read respond I-service
+			GPIOB->ODR |= (1 << IOL_mon);
+			iol_mt1_2.OD[0] = 0xD0 | (1);// I-service is Read response(+) and the data length is 1 (Just for testing)
+			iol_mt1_2.OD[1] = 0x00;
+			break;
+		
+		case 0x11:// FlowCTRL IDLE1
+			// Reply with OD = 0x00
+			iol_mt1_2.OD[0] = 0x00;
+			iol_mt1_2.OD[1] = 0x00;
+			break;
+		
+		case 0x1F:// FlowCTRL ABORT
+			break;
+		
+		case 0x12:// FlowCTRL IDLE2 (reserved for future use, no use here for now...)
+		default:// 0x13 to 0x1E is reserved
+			break;
+	}
+	
+	iol_pl_update_WriteBuffer(&iol_mt1_2.CKS);
+	iol_mt1_2.CKS = 0x00;
+	iol_pl_WriteRequest(3);// Return Type 1_2 message reply
+
+exit_t12isdu_ja:
+	prev_FlowCTRL = address;
 }
 
 void iol_dl_T12WriteISDU(uint8_t address){
 
+}
+
+uint8_t iol_dl_getModeStatus(){
+	return dl_mode_fsm;
 }

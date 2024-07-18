@@ -96,7 +96,7 @@ typedef struct{
 void iol_dl_init();
 
 void iol_dl_poll();
-uint8_t iol_dl_getStatus();
+uint8_t iol_dl_getModeStatus();
 
 
 #endif
