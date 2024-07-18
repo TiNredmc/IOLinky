@@ -27,4 +27,15 @@ void spi_WriteOnceAndWrite(
 	uint8_t *TXbuf,
 	size_t len);
 
+uint8_t spi_l6364FastReadFF(
+	uint8_t *FR,
+	uint8_t *statusReg
+	);
+
+void spi_l6364FastWriteFF(
+		uint8_t count,
+		uint8_t *FR,
+		uint8_t *statusReg	
+	);
+
 #endif

@@ -6,7 +6,7 @@ void spi_init(){
 	SPI1->CR1 = 
 		SPI_CR1_SSI |
 		SPI_CR1_SSM	|						// SSM = 1
-		(2 << SPI_CR1_BR_Pos) | // Divide 64Mhz to 8Mhz SPI clock
+		(1 << SPI_CR1_BR_Pos) | // Divide 64Mhz to get 16Mhz SPI clock
 		SPI_CR1_MSTR;						// Master SPI mode
 	
 	SPI1->CR2 = 
@@ -64,7 +64,7 @@ void spi_read(uint8_t *data, size_t len){
 }
 
 void spi_Write(uint8_t *data, size_t len){
-	uint8_t spi_fsm = 0;	
+  uint8_t spi_fsm = 0;	
 		
 	GPIOA->ODR &= ~(1 << SPI1_SS);	
 	
@@ -170,13 +170,12 @@ void spi_WriteOnceAndRead(
 	uint8_t *RXbuf,
 	size_t len){
 
-	volatile uint8_t spi_fsm;		
-		
+	uint8_t spi_fsm = 0;		
+
   GPIOA->ODR &= ~(1 << SPI1_SS);	
 	len++;
 
 	do{
-		
 		switch(spi_fsm){
 			case 0:// Send data to SPI
 			{
@@ -187,7 +186,7 @@ void spi_WriteOnceAndRead(
 
 			case 3:// Send dummy data
 			{
-				*(__IO uint8_t *)&SPI1->DR = 0x00;
+				*(__IO uint8_t *)&SPI1->DR = TX & 0x80;
 				spi_fsm = 1;
 			}
 			break;
@@ -218,7 +217,7 @@ void spi_WriteOnceAndRead(
 		}
 		
 	}while(len);
-
+	
 	GPIOA->ODR |= (1 << SPI1_SS);
 	
 }
@@ -228,7 +227,7 @@ void spi_WriteOnceAndWrite(
 	uint8_t *TXbuf,
 	size_t len){
 	
-	volatile uint8_t spi_fsm;		
+	uint8_t spi_fsm = 0;		
 
 	GPIOA->ODR &= ~(1 << SPI1_SS);	
 	len++;
@@ -275,4 +274,194 @@ void spi_WriteOnceAndWrite(
 	}while(len);
 
 	GPIOA->ODR |= (1 << SPI1_SS);
+}
+	
+uint8_t spi_l6364FastReadFF(
+	uint8_t *FR,
+	uint8_t *statusReg
+	){
+	uint8_t spi_fsm = 0;		
+	uint8_t ff_len = 0;
+	uint8_t ret = 0;
+		
+	GPIOA->ODR &= ~(1 << SPI1_SS);	
+
+	do{
+		
+		switch(spi_fsm){
+			case 0:// Send LINK2 address
+			{
+				*(__IO uint8_t *)&SPI1->DR = 0x0F;
+				spi_fsm = 1;
+			}	
+			break;
+			
+			case 1:// Wait for RX data
+			{
+				if((SPI1->SR & SPI_SR_RXNE) != 0){
+					spi_fsm = 2;
+				}
+			}
+			break;
+			
+			case 2:// Read back status data
+			{
+				*statusReg = *(__IO uint8_t *)&SPI1->DR;
+				
+				spi_fsm = 3;
+			}
+			break;
+			
+			case 3:// Send dummy byte for reacdback
+			{
+				*(__IO uint8_t *)&SPI1->DR = 0xFF;
+				spi_fsm = 4;
+			}
+			break;
+			
+			case 4:// Wait for RX data
+			{
+				if((SPI1->SR & SPI_SR_RXNE) != 0){
+					spi_fsm = 5;
+				}
+			}
+			break;
+			
+			case 5:// Get reading Length
+			{
+				ff_len = *(__IO uint8_t *)&SPI1->DR;
+				ff_len >>= 2;
+				
+				ff_len &= 0x0F;
+				
+				ret = ff_len;
+				
+				if(ff_len == 0)
+					goto exit_ja;
+				
+				
+				spi_fsm = 6;
+			}
+			break;
+			
+			case 6:// Send dummy byte for readback
+			{
+				*(__IO uint8_t *)&SPI1->DR = 0xFF;
+				spi_fsm = 7;
+			}
+			break;
+			
+			case 7:// Wait for RX data
+			{
+				if((SPI1->SR & SPI_SR_RXNE) != 0){
+					spi_fsm = 8;
+				}
+			}
+			break;
+			
+			case 8:// Read back
+			{
+				*FR++ = *(__IO uint8_t *)&SPI1->DR;
+				
+				ff_len--;
+				if(ff_len == 0)
+					goto exit_ja;
+				
+				spi_fsm = 6;
+			}
+			break;
+		}
+		
+	}while(1);
+	
+exit_ja:	
+
+	GPIOA->ODR |= (1 << SPI1_SS);
+	return ret;
+}
+
+void spi_l6364FastWriteFF(
+		uint8_t count,
+		uint8_t *FR,
+		uint8_t *statusReg
+	){
+		
+	if(count > 0x0F)
+			goto exit_ja;
+		
+	uint8_t spi_fsm = 0;		
+	uint8_t ff_len = 0;
+	
+	GPIOA->ODR &= ~(1 << SPI1_SS);	
+
+	do{
+		
+		switch(spi_fsm){
+			case 0:// Send LINK2 (write) address
+			{
+				*(__IO uint8_t *)&SPI1->DR = 0x0F | 0x80;
+				spi_fsm = 1;
+			}	
+			break;
+			
+			case 1:// Wait for RX data
+			{
+				if((SPI1->SR & SPI_SR_RXNE) != 0){
+					spi_fsm = 2;
+				}
+			}
+			break;
+			
+			case 2:// Read back status data
+			{
+				*statusReg = *(__IO uint8_t *)&SPI1->DR;
+				
+				spi_fsm = 3;
+			}
+			break;
+			
+			case 3:// Send LINK data
+			{
+				// Send Data buffer fill count and set SND bit
+				*(__IO uint8_t *)&SPI1->DR = (count << 2) | 1;
+				
+				spi_fsm = 4;
+			}
+			break;
+			
+			case 4:// Wait for RX data
+			{
+				if((SPI1->SR & SPI_SR_RXNE) != 0){
+					spi_fsm = 5;
+				}
+			}
+			break;
+			
+			case 5:// Dummy read
+			{
+				(void)*(__IO uint8_t *)&SPI1->DR;
+				
+				if(count == 0)
+					goto exit_ja;
+				
+				spi_fsm = 6;
+			}
+			break;
+			
+			case 6:// Send IO-Link data to FR buffer
+			{
+				*(__IO uint8_t *)&SPI1->DR = *FR++;				
+				count--;
+
+				spi_fsm = 4;
+			}
+			break;
+		}
+		
+	}while(1);
+	
+exit_ja:	
+
+	GPIOA->ODR |= (1 << SPI1_SS);		
+		
 }

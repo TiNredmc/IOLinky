@@ -38,35 +38,35 @@ void l6364_getStatus(){
 }
 
 uint8_t l6364_isRST(){
-	return l6364_t.status.statusBit.RST;
+	return l6364_t.status.STATUS & 0x80;
 }
 
 uint8_t l6364_isINT(){
-	return l6364_t.status.statusBit.INT;
+	return l6364_t.status.STATUS & 0x40;
 }
 
 uint8_t l6364_isUV(){
-	return l6364_t.status.statusBit.UV;
+	return l6364_t.status.STATUS & 0x20;
 }
 
 uint8_t l6364_isDINT(){
-	return l6364_t.status.statusBit.DINT;
+	return l6364_t.status.STATUS & 0x10;
 }
 
 uint8_t l6364_isCHK(){
-	return l6364_t.status.statusBit.CHK;
+	return l6364_t.status.STATUS & 0x08;
 }
 
 uint8_t l6364_isDAT(){
-	return l6364_t.status.statusBit.DAT;
+	return l6364_t.status.STATUS & 0x04;
 }
 
 uint8_t l6364_isSSC(){
-	return l6364_t.status.statusBit.SSC;
+	return l6364_t.status.STATUS & 0x02;
 }
 
 uint8_t l6364_isSOT(){
-	return l6364_t.status.statusBit.SOT;
+	return l6364_t.status.STATUS & 0x01;
 }
 
 
@@ -88,20 +88,20 @@ void l6364_setMseq(
 }
 
 void l6364_setUVLO(uint8_t uvlo_val){
-	
+	l6364_t.cfg.CFG = l6364_readReg(REG_CFG);
 	l6364_t.cfg.cfgBit.UVT = uvlo_val;
 	l6364_writeReg(
-		REG_MSEQ,
+		REG_CFG,
 		l6364_t.cfg.CFG
 	);
 	
 }
 
 void l6364_setCOM(uint8_t com_mode){
-	
+	l6364_t.cfg.CFG = l6364_readReg(REG_CFG);
 	l6364_t.cfg.cfgBit.BD = com_mode;
 	l6364_writeReg(
-		REG_MSEQ,
+		REG_CFG,
 		l6364_t.cfg.CFG
 	);
 }
@@ -123,6 +123,7 @@ void l6364_setLED2(uint8_t Iled){
 }
 
 void l6364_setIOLmode(){
+	l6364_t.cctl.CCTL = l6364_readReg(REG_CCTL);
 	l6364_t.cctl.cctlBit.SIO = 0;
 	l6364_writeReg(
 		REG_CCTL,
@@ -131,6 +132,7 @@ void l6364_setIOLmode(){
 }
 
 void l6364_setSIOmode(){
+	l6364_t.cctl.CCTL = l6364_readReg(REG_CCTL);
 	l6364_t.cctl.cctlBit.SIO = 1;
 	l6364_writeReg(
 		REG_CCTL,
@@ -169,6 +171,7 @@ void l6364_readFIFO(
 		
 	l6364_t.status.STATUS = l6364_data_t.stat0;
 		
+	// Copy fron shadow register to actual memory	
 	while(count--){
 		*output_ptr++ = *fr_ptr++;
 	}
@@ -195,21 +198,56 @@ void l6364_writeFIFO(
 		(uint8_t *)(&l6364_data_t.FR);
 
 	spi_WriteOnceAndWrite(
-		REG_FR0,
+		REG_FR0 | 0x80,
 		input_ptr,
 		count
 	);
+	
+}
 
-	// Copy data to shadow register
-	while(count--){
-		*fr_prt++ = *input_ptr++;
-	}	
+uint8_t l6364_readFIFOFast(uint8_t *output_ptr){
+	uint8_t ret = 0;
+	ret = spi_l6364FastReadFF(
+		output_ptr,
+		&l6364_t.status0.STATUS
+	);
+	l6364_t.status.STATUS = l6364_t.status0.STATUS;
+	return ret;
 }
 
 
+void l6364_writeFIFOFast(
+	uint8_t count,
+	uint8_t *input_ptr 
+	){
+	spi_l6364FastWriteFF(
+		count,
+		input_ptr,
+		&l6364_t.status0.STATUS
+	);
+	l6364_t.status.STATUS = l6364_t.status0.STATUS;
+}
 
+	
+void l6364_linkEnd(){
+	l6364_t.link.linkBit.END = 1;
+	l6364_t.link2.LINK2 = l6364_t.link.LINK;
+	
+	l6364_writeReg(
+		REG_LINK,
+		l6364_t.link.LINK
+	);
+}
 
-
+void l6364_linkSend(){
+	l6364_t.link.linkBit.SND = 1;
+	l6364_t.link2.LINK2 = l6364_t.link.LINK;
+	
+	l6364_writeReg(
+		REG_LINK,
+		l6364_t.link.LINK
+	);
+}
 
 
 

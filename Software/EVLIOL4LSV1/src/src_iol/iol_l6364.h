@@ -23,12 +23,10 @@
 
 /* REGSITER AND DATA STRUCTs*/
 
-typedef struct{
+typedef struct __attribute__((packed)){
 	// Shadown register of status register (First byte transaction from the SPI)
 	union{
-		uint8_t STATUS;
 		struct{
-			uint8_t RST			:1;
 			uint8_t INT			:1;
 			uint8_t	UV			:1;
 			uint8_t DINT		:1;
@@ -36,77 +34,79 @@ typedef struct{
 			uint8_t DAT			:1;
 			uint8_t SSC			:1;
 			uint8_t SOT			:1;
+			uint8_t RST			:1;
 		}statusBit;
+		uint8_t STATUS;
 	}status0;
 	
 	
 	// MSEQ register
 	union{
-		uint8_t MSEQ;
 		struct{
-			uint8_t OD1			:2;
-			uint8_t M2CNT		:4;
 			uint8_t OD2			:2;
+			uint8_t M2CNT		:4;
+			uint8_t OD1			:2;
 		}mseqBit;
+		uint8_t MSEQ;
 	}mseq;
 	
 	// CFG register
 	union{
-		uint8_t CFG;
 		struct{
-			uint8_t UVT			:3;
-			uint8_t BD			:1;
-			uint8_t RF			:1;
-			uint8_t PD5V		:1;
 			uint8_t res			:2;
+			uint8_t PD5V		:1;
+			uint8_t RF			:1;
+			uint8_t BD			:1;
+			uint8_t UVT			:3;
 		}cfgBit;
+		uint8_t CFG;
 	}cfg;
 	
 	// CCTL register
 	union{
-		uint8_t CCTL;
 		struct{
-			uint8_t TRNS		:1;
-			uint8_t SCT			:3;
-			uint8_t SGL			:1;
-			uint8_t SIO			:1;
-			uint8_t HS			:1;
 			uint8_t LS			:1;
+			uint8_t HS			:1;
+			uint8_t SIO			:1;
+			uint8_t SGL			:1;
+			uint8_t SCT			:3;
+			uint8_t TRNS		:1;
 		}cctlBit;
+		uint8_t CCTL;
 	}cctl;
 
 	// DCTL register
 	union{
-		uint8_t	DCTL;
 		struct{
-			uint8_t EXT			:1;
-			uint8_t SCT			:3;
-			uint8_t IEN			:1;
-			uint8_t DIO			:1;
-			uint8_t HS			:1;
 			uint8_t LS			:1;
+			uint8_t HS			:1;
+			uint8_t DIO			:1;
+			uint8_t IEN			:1;
+			uint8_t SCT			:3;
+			uint8_t EXT			:1;
 		}dctlBit;
+		uint8_t	DCTL;
 	}dctl;
 	
 	// LINK register
 	union{
-		uint8_t LINK;
 		struct{
-			uint8_t res			:2;
-			uint8_t CNT			:4;
-			uint8_t END			:1;
 			uint8_t SND			:1;
+			uint8_t END			:1;
+			uint8_t CNT			:4;
+			uint8_t res			:2;
 		}linkBit;
+		uint8_t LINK;
 	}link;
 	
 	// THERM register
 	union{
-		uint8_t THERM;
 		struct{
-			uint8_t AUT			:1;
-			uint8_t RES 		:2;
 			uint8_t TH			:5;
+			uint8_t RES 		:2;
+			uint8_t AUT			:1;
 		}thermBit;
+		uint8_t THERM;
 	}therm;
 	
 	// TEMP register
@@ -116,40 +116,38 @@ typedef struct{
 	
 	// LED register
 	union{
-		uint8_t LED;
 		struct{
-			uint8_t LED1		:4;
 			uint8_t LED2		:4;
+			uint8_t LED1		:4;
 		}ledBit;
+		uint8_t LED;
 	}led;
 	
 	// DCDC register
 	union{
-		uint8_t DCDC;
 		struct{
-			uint8_t DIS			:1;
-			uint8_t BYP			:1;
-			uint8_t FSET		:3;
 			uint8_t VSET		:3;
+			uint8_t FSET		:3;
+			uint8_t BYP			:1;
+			uint8_t DIS			:1;
 		}dcdcBit;
+		uint8_t DCDC;
 	}dcdc;
 	
 	// DSTAT register
 	union{
-		uint8_t DSTAT;
 		struct{
-			uint8_t res			:5;
-			uint8_t	LVL			:1;
-			uint8_t SSC			:1;
 			uint8_t res2		:1;
+			uint8_t SSC			:1;
+			uint8_t	LVL			:1;
+			uint8_t res			:5;
 		}dstatBit;
+		uint8_t DSTAT;
 	}dstat;
 	
 	// STATUS register
 	union{
-		uint8_t STATUS;
 		struct{
-			uint8_t RST			:1;
 			uint8_t INT			:1;
 			uint8_t	UV			:1;
 			uint8_t DINT		:1;
@@ -157,26 +155,28 @@ typedef struct{
 			uint8_t DAT			:1;
 			uint8_t SSC			:1;
 			uint8_t SOT			:1;
+			uint8_t RST			:1;
 		}statusBit;
+		uint8_t STATUS;
 	}status;
 	
 	uint8_t reserved[4];// Secrets hidden here?
 	
 	// LINK2 Register
 	union{
-		uint8_t LINK2;
 		struct{
-			uint8_t res 		:2;
-			uint8_t CNT			:4;
-			uint8_t END			:1;
 			uint8_t SND			:1;
+			uint8_t END			:1;
+			uint8_t CNT			:4;
+			uint8_t res			:2;
 		}link2Bit;
+		uint8_t LINK2;
 	}link2;
 	
 }l6364_reg_t;
 
-// L6364 FIFO data Register
-typedef struct{
+// L6364 FIFO read data Register
+typedef struct __attribute__((packed)){
 	uint8_t stat0;
 	
 	// Buffer register
@@ -184,35 +184,36 @@ typedef struct{
 
 }l6364_fr_t;
 
-/* END REGSITER AND DATA STRUCTs*/
+
+/* END REGSITERs AND DATA STRUCTs*/
 
 /* ENUMs*/
 enum MSEQ_OD1{
 	MSEQ_OD1_BC = 0,
-	MSEQ_OD1_2B,
-	MSEQ_OD1_8B
+	MSEQ_OD1_2B = 1,
+	MSEQ_OD1_8B = 2
 };
 
 enum MSEQ_OD2{
 	MSEQ_OD2_1B = 0,
-	MSEQ_OD2_2B,
-	MSEQ_OD2_8B
+	MSEQ_OD2_2B = 1,
+	MSEQ_OD2_8B = 2
 };
 
 enum CFG_UVLO{
 	UVLO_15V0 = 0,
-	UVLO_14V0,
-	UVLO_13V0,
-	UVLO_12V0,
-	UVLO_10V5,
-	UVLO_8V5,
-	UVLO_7V5,
-	UVLO_6V0
+	UVLO_14V0 = 1,
+	UVLO_13V0 = 2,
+	UVLO_12V0 = 3,
+	UVLO_10V5 = 4,
+	UVLO_8V5  = 5,
+	UVLO_7V5  = 6,
+	UVLO_6V0  = 7
 };
 
 enum COM_MODE{
 	COM2 = 0,
-	COM3
+	COM3 = 1
 };
 
 // CCTL and DCTL ISET
@@ -251,9 +252,16 @@ enum DCDC_VSET{
 
 /* END ENUMs*/
 
-uint8_t l6364_readReg(uint8_t reg);
-void l6364_writeReg(uint8_t reg, uint8_t data);
 
+// Peforms IO stuffs
+uint8_t l6364_readReg(uint8_t reg);
+void l6364_writeReg(
+	uint8_t reg, 
+	uint8_t data
+	);
+void l6364_setCOM(uint8_t com_mode);
+
+// Status related
 void l6364_getStatus();
 uint8_t l6364_isRST();
 uint8_t l6364_isINT();
@@ -264,15 +272,24 @@ uint8_t l6364_isDAT();
 uint8_t l6364_isSSC();
 uint8_t l6364_isSOT();
 
+// M-sequence related stuffs
 void l6364_setMseq(
 	uint8_t m_len,		// Master message length (Including MC and CKT)
 	uint8_t	od1_len,	// 
 	uint8_t od2_len		//
 	);
+uint8_t iol_pl_getCurrentMtype();
+void iol_pl_setMtype0();
+void iol_pl_setMtype1_2();
+
 void l6364_setUVLO(uint8_t uvlo_val);
-void l6364_setCOM(uint8_t com_mode);
+
+
+// Set LED brightness
 void l6364_setLED1(uint8_t Iled);
 void l6364_setLED2(uint8_t Iled);
+
+// Set Operation modes
 void l6364_setIOLmode();
 void l6364_setSIOmode();
 
@@ -280,19 +297,28 @@ void l6364_setSIOmode();
 // Periodic execution with timer or millis thingy super-loop
 void l6364_pollAllReg();
 uint8_t l6364_pollLinkCnt();
+
+// FIFO r/w stuffs
 uint8_t l6364_getRxCount();// Same as pollLinkCnt but retrieve fresh data from SPI.
 void l6364_readFIFO(
 	uint8_t count, 
 	uint8_t *output_ptr
 	);
+
 void l6364_setTXCount(uint8_t count);
 void l6364_writeFIFO(
 	uint8_t count,
 	uint8_t *input_ptr
 	);
 
+uint8_t l6364_readFIFOFast(uint8_t *output_ptr);
+void l6364_writeFIFOFast(
+	uint8_t count,
+	uint8_t *input_ptr 
+	);
 
-
+void l6364_linkEnd();
+void l6364_linkSend();
 
 
 
