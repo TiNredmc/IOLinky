@@ -41,9 +41,13 @@ void app_initGPIO(){
 	// Init IPS4260 sink-driver pins
 	GPIOB->MODER &=
 		~(
+		(3 << IOL_mon * 2)			|
 		(3 << OL_pin * 2) |			// Input
 		(3 << FLT_pin * 2)			// Input
 		);
+		
+	GPIOB->MODER |= (1 << IOL_mon * 2);
+	GPIOB->OSPEEDR |= (3 << IOL_mon *2); 
 		
 	GPIOD->MODER &=
 		~(
@@ -65,52 +69,36 @@ void app_initIO(){
 	systick_init(F_CPU, 1000);			// Setup 1000 systick
 	app_initGPIO();
 	spi_init();
-	iol_pl_init(NULL, NULL);
+	
 }
 
-uint8_t app_fsm = 0;
-
 uint32_t led_millis = 0;
-
-void app_runner(){
-	iol_pl_poll();
-	
+void app_iol_aliveTask(){
 	if((millis() - led_millis) > 100){
 		led_millis = millis();
 		iol_pl_aliveLED();
 	}
-	
+}
+
+uint8_t app_fsm = 0;
+// Tasks and FSMs that runs this IO-Link device
+void app_runner(){
 	switch(app_fsm){
 		case APP_INIT_STATE:
 		{
+			iol_dl_init();
 			
-			
-			//app_fsm = APP_WAIT_WU;
+			app_fsm = APP_RUN_STATE;
 		}
 		break;
 		
-		case APP_WAIT_WU:// Check wake up current
+		case APP_RUN_STATE:// Check wake up current
 		{
-			
-			
-			app_fsm = APP_GET_PREOP;
-			
+			iol_pl_pollRead();
+			iol_dl_poll();
+			iol_pl_pollWrite();
+			app_iol_aliveTask();
 		}
-		break;
-		
-		case APP_GET_PREOP:// Get Preoperate data from IO Link Master
-		{
-			// if data present in the buffer
-			
-			
-		}
-		break;
-		
-		case APP_PROC_PREOP:// Process Preoperate data
-		{
-			
-		}
-		break;
 		
 		default:
 			break;

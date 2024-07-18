@@ -10,6 +10,7 @@
 #define SPI1_MISO		6
 
 // Port B
+#define IOL_mon			2
 #define OL_pin			3
 #define FLT_pin			4
 
