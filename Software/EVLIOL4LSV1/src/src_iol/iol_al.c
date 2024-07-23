@@ -11,8 +11,8 @@ device_directparam_t device_dp_t = {
 		0x11,					// RevisionID
 		16,					// ProcessDataIn 16 Bit
 		0,					// ProcessDataOut;
-		0x3412,				// VendorID
-		0xA017DE,				// DeviceID
+		0xFFFF,				// VendorID
+		0x563412,				// DeviceID
 		0,					// FunctionID
 		0,					// --Reserved--
 		0						// SystemCommand

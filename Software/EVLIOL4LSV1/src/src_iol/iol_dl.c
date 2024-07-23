@@ -113,7 +113,7 @@ void iol_dl_poll(){
 	}
 		
 	switch(dl_main_fsm){
-		case DL_MFSM_PR:// Wait for test message after wake up pulse
+		case DL_MFSM_PR:// Wait for UART message.
 		{
 			if(!iol_pl_ReadAvailable())
 				break;
@@ -212,7 +212,7 @@ void iol_dl_modeSwitcher(){
 // of each operating mode.
 // STARTUP mode is default to use TYPE 0 message
 // in this example code PREOPERATE mode is also use TYPE 0 message
-// but in OPERATE mode, the M-sequence message type is TYPE 1_2
+// but in OPERATE mode, the M-sequence message type is TYPE 2_1
 void iol_dl_modeHandler(){
 
 	switch(dl_mode_fsm){
@@ -465,8 +465,8 @@ void iol_dl_T22ProcessDataRead(uint8_t address){
 		// Valid : in address range
 		iol_mt2_2.OD = 0x00;
 		
-		iol_mt2_2.PD_Hi = *(pdIn_ptr + (2 * address));
-		iol_mt2_2.PD_Lo = *(pdIn_ptr + (2 * address) + 1);
+		iol_mt2_2.PD_Lo = *(pdIn_ptr + (2 * address));
+		iol_mt2_2.PD_Hi = *(pdIn_ptr + (2 * address) + 1);
 		
 		iol_mt2_2.CKS = 0x00;
 	}else{
@@ -748,37 +748,38 @@ void iol_dl_craftISDURead(){
 		isdu_idx = iol_iservice.Index[0];
 	}
 	
+	memset(ISDU_out_buffer, 0, 67);
 	ISDU_out_buffer[0] = 0xD0;// Default Read Response (+) I-service;
 	
 	switch(isdu_idx){
-		case 0x0010:// Vendor Name (64 Bytes) Mandatory!
+		case 0x0010:// Vendor Name (64 Bytes) Mandatory! -> Works !
 		{
-			ISDU_data_count = 16 + 3;
+			ISDU_data_count = 64 + 3;
 			ISDU_out_buffer[0] |= 1;// Length
 			ISDU_out_buffer[1] = ISDU_data_count;
-			memcpy(ISDU_out_buffer+2, "TinLethax", 9);
+			memcpy(ISDU_out_buffer+2, "KMITL", 5);
 			iol_dl_xorISDU(ISDU_data_count);
 			
 		}
 		break;
 		
-		case 0x0011:// Vendor Text (64 Bytes)
-		{
-			ISDU_data_count = 16 + 3;
-			ISDU_out_buffer[0] |= 1;// Length
-			ISDU_out_buffer[1] = ISDU_data_count;
-			memcpy(ISDU_out_buffer+2, "TinLethax", 9);
-			iol_dl_xorISDU(ISDU_data_count);
-			
-		}
-		break;
+//		case 0x0011:// Vendor Text (64 Bytes)
+//		{
+//			ISDU_data_count = 64 + 3;
+//			ISDU_out_buffer[0] |= 1;// Length
+//			ISDU_out_buffer[1] = ISDU_data_count;
+//			memcpy(ISDU_out_buffer+2, "TinLethax", 9);
+//			iol_dl_xorISDU(ISDU_data_count);
+//			
+//		}
+//		break;
 		
 		case 0x0012:// Product Name (64 Bytes) Mandatory
 		{
-			ISDU_data_count = 16 + 3;
+			ISDU_data_count = 64 + 3;
 			ISDU_out_buffer[0] |= 1;// Length
 			ISDU_out_buffer[1] = ISDU_data_count;
-			memcpy(ISDU_out_buffer+2, "TinLethax", 9);
+			memcpy(ISDU_out_buffer+2, "IOLinky 1.0", 11);
 			iol_dl_xorISDU(ISDU_data_count);
 			GPIOB->ODR |= (1 << IOL_mon);
 		}
@@ -786,32 +787,32 @@ void iol_dl_craftISDURead(){
 		
 		case 0x0013:// Product ID (64 Bytes)
 		{
-			ISDU_data_count = 16 + 3;
+			ISDU_data_count = 64 + 3;
 			ISDU_out_buffer[0] |= 1;// Length
 			ISDU_out_buffer[1] = ISDU_data_count;
-			memcpy(ISDU_out_buffer+2, "TinLethax", 9);
+			memcpy(ISDU_out_buffer+2, "10Linky", 7);
 			iol_dl_xorISDU(ISDU_data_count);
 			
 		}
 		break;
 		
-		case 0x0014:// Product Text (64 Bytes)
-		{
-			ISDU_data_count = 16 + 3;
-			ISDU_out_buffer[0] |= 1;// Length
-			ISDU_out_buffer[1] = ISDU_data_count;
-			memcpy(ISDU_out_buffer+2, "TinLethax", 9);
-			iol_dl_xorISDU(ISDU_data_count);
-			
-		}
-		break;
+//		case 0x0014:// Product Text (64 Bytes)
+//		{
+//			ISDU_data_count = 64 + 3;
+//			ISDU_out_buffer[0] |= 1;// Length
+//			ISDU_out_buffer[1] = ISDU_data_count;
+//			memcpy(ISDU_out_buffer+2, "TinLethax", 9);
+//			iol_dl_xorISDU(ISDU_data_count);
+//			
+//		}
+//		break;
 		
-		case 0x0015:// Serial Number (16 Bytes)
+		case 0x0015:// Serial Number (16 Bytes) -> Works !
 		{
 			ISDU_data_count = 16 + 3;
 			ISDU_out_buffer[0] |= 1;// Length
 			ISDU_out_buffer[1] = ISDU_data_count;
-			memcpy(ISDU_out_buffer+2, "TinLethax", 9);
+			memcpy(ISDU_out_buffer+2, "1234ABCD", 8);
 			iol_dl_xorISDU(ISDU_data_count);
 		}
 		break;
