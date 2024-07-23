@@ -17,12 +17,9 @@ void HardFault_Handler(void){
 
 int main(){
 	app_initIO();
-	
-	
 
 	while(1){
 		app_runner();
-		
 	}
 
 

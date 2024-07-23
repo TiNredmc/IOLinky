@@ -145,4 +145,13 @@ void iol_pl_setMtype1_2(){
 	current_mtype = MTYPE_1_2;
 }
 
+void iol_pl_setMtype2_2(){
+	l6364_setMseq(
+		2,
+		MSEQ_OD1_BC,// Ignored by the chip in Type 2
+		MSEQ_OD2_1B
+	);
+	current_mtype = MTYPE_2_2;
+}
+
 // ========= END Set M-Seq Type ====================

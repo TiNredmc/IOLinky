@@ -1,5 +1,11 @@
 #include "app_device_impl.h"
 
+// Private variables
+uint32_t led_millis = 0;
+uint8_t alive_fsm = 0;
+uint8_t app_fsm = 0;
+
+// Setup all required GPIOs.
 void app_initGPIO(){
 	RCC->IOPENR = (uint32_t)(0x3F);	// Enable all GPIO clock
 	
@@ -64,6 +70,7 @@ void app_initGPIO(){
 		(1 << OUT4_pin * 2);		// Output
 }
 
+// Init IO system
 void app_initIO(){
 	clk_initSysClk();								// Setup system clock
 	systick_init(F_CPU, 1000);			// Setup 1000 systick
@@ -72,14 +79,15 @@ void app_initIO(){
 	
 }
 
-uint32_t led_millis = 0;
-uint8_t alive_fsm = 0;
+// Task to serve alive LED status.
+// Warning, the green LED is so bright
+// So freaking bright it is k*lling me (ToT).
 void app_iol_aliveTask(){
 	
 	if((millis() - led_millis) > 100){
 		led_millis = millis();
 		switch(alive_fsm){
-			case 0:
+			case 0:// Status : IO-Link inactive
 				{
 					iol_pl_standbyLED();
 					if(iol_dl_getModeStatus() == DL_MODE_OP){
@@ -89,7 +97,7 @@ void app_iol_aliveTask(){
 				}
 				break;
 				
-			case 1:
+			case 1:// Status : IO-Link active
 				{
 					iol_pl_connectedLED();
 					if(iol_dl_getModeStatus() != DL_MODE_OP){
@@ -103,14 +111,12 @@ void app_iol_aliveTask(){
 	}
 }
 
-uint8_t app_fsm = 0;
 // Tasks and FSMs that runs this IO-Link device
 void app_runner(){
 	switch(app_fsm){
 		case APP_INIT_STATE:
 		{
-			iol_dl_init();
-			
+			iol_al_init();
 			app_fsm = APP_RUN_STATE;
 		}
 		break;

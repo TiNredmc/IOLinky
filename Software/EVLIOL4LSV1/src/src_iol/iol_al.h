@@ -2,8 +2,22 @@
 #define IOL_AL_H
 
 #include <stdint.h>
+#include "iol_dl.h"
 
-typedef struct{
+enum PREOP_MSEQ_CODE{
+	PREOP_M_0 = 0,
+	PREOP_M_1_2 = 16,
+	PREOP_M_1_V8 = 32,
+	PREOP_M_1_V32 = 48
+};
+
+enum OP_MSEQ_CODE{
+	OP_M_0 = 0,
+	OP_M_1_2 = 2,
+	OP_M_2_2 = 0
+};
+
+typedef struct __attribute__((packed)){
 	// Comminucation Control
 	uint8_t MasterCommand;
 	
@@ -66,9 +80,9 @@ typedef struct{
 	union{
 	uint32_t DeviceID:24;
 	struct{
-		uint8_t DeviceID1;
-		uint8_t DeviceID2;
-		uint8_t DeviceID3;
+		uint8_t DeviceID1:8;
+		uint8_t DeviceID2:8;
+		uint8_t DeviceID3:8;
 	};
 	};
 	uint16_t FunctionID;
@@ -81,10 +95,16 @@ typedef struct{
 	uint8_t data[0x0F];
 }direct_param_p2_t;
 
-typedef struct{
+typedef struct __attribute__((packed)){
 	direct_param_p1_t dp_p1_t;
 	direct_param_p2_t dp_p2_t;
 }device_directparam_t;
 
+//typedef struct __attribute__((packed)){
+//	
+//};
+
+
+void iol_al_init();
 
 #endif

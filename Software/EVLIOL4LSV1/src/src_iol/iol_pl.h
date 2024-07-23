@@ -7,7 +7,7 @@
 enum current_mtype_e{
 	MTYPE_0 = 0,
 	MTYPE_1_2,
-
+	MTYPE_2_2,
 };
 
 void iol_pl_init(
@@ -37,7 +37,7 @@ void iol_pl_LinkEND();
 uint8_t iol_pl_getCurrentMtype();
 void iol_pl_setMtype0();
 void iol_pl_setMtype1_2();
-
+void iol_pl_setMtype2_2();
 
 
 #endif
