@@ -312,7 +312,7 @@ void l6364_writeFIFO(
 	);
 
 uint8_t l6364_readFIFOFast(uint8_t *output_ptr);
-void l6364_writeFIFOFast(
+uint8_t l6364_writeFIFOFast(
 	uint8_t count,
 	uint8_t *input_ptr 
 	);

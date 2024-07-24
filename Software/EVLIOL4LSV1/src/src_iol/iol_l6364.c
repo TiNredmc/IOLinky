@@ -209,23 +209,27 @@ uint8_t l6364_readFIFOFast(uint8_t *output_ptr){
 	uint8_t ret = 0;
 	ret = spi_l6364FastReadFF(
 		output_ptr,
-		&l6364_t.status0.STATUS
+		&l6364_t.status0.STATUS,
+    100
 	);
 	l6364_t.status.STATUS = l6364_t.status0.STATUS;
 	return ret;
 }
 
 
-void l6364_writeFIFOFast(
+uint8_t l6364_writeFIFOFast(
 	uint8_t count,
 	uint8_t *input_ptr 
 	){
-	spi_l6364FastWriteFF(
+  uint8_t ret = 0;
+	ret = spi_l6364FastWriteFF(
 		count,
 		input_ptr,
-		&l6364_t.status0.STATUS
+		&l6364_t.status0.STATUS,
+    100
 	);
 	l6364_t.status.STATUS = l6364_t.status0.STATUS;
+	return ret;
 }
 
 	

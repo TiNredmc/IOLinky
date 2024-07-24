@@ -1,4 +1,5 @@
 #include "spi.h"
+#include "Systick_delay.h"
 
 void spi_init(){
 	RCC->APBENR2 |= RCC_APBENR2_SPI1EN;// Enable SPI1 peripheral clock.
@@ -279,11 +280,13 @@ void spi_WriteOnceAndWrite(
 uint8_t spi_l6364FastReadFF(
 	uint8_t *FR,
 	uint8_t *statusReg
+  uint32_t timeout
 	){
 	uint8_t spi_fsm = 0;		
 	uint8_t ff_len = 0;
 	uint8_t ret = 0;
-		
+  uint32_t t_start = millis();
+
 	GPIOA->ODR &= ~(1 << SPI1_SS);	
 
 	do{
@@ -371,7 +374,13 @@ uint8_t spi_l6364FastReadFF(
 			}
 			break;
 		}
-		
+
+    if((millis() - t_start) >= timeout)
+    {
+      ret = 0;
+      goto exit_ja;
+    }
+
 	}while(1);
 	
 exit_ja:	
@@ -380,17 +389,20 @@ exit_ja:
 	return ret;
 }
 
-void spi_l6364FastWriteFF(
+uint8_t spi_l6364FastWriteFF(
 		uint8_t count,
 		uint8_t *FR,
 		uint8_t *statusReg
+    uint32_t timeout
 	){
 		
-	if(count > 0x0F)
-			goto exit_ja;
-		
+  uint8_t ret = 0;  
 	uint8_t spi_fsm = 0;		
 	uint8_t ff_len = 0;
+  uint32_t t_start = millis();
+
+	if(count > 0x0F)
+			goto exit_ja;
 	
 	GPIOA->ODR &= ~(1 << SPI1_SS);	
 
@@ -442,7 +454,10 @@ void spi_l6364FastWriteFF(
 				(void)*(__IO uint8_t *)&SPI1->DR;
 				
 				if(count == 0)
+        {
+          ret = 1;
 					goto exit_ja;
+        }
 				
 				spi_fsm = 6;
 			}
@@ -457,11 +472,17 @@ void spi_l6364FastWriteFF(
 			}
 			break;
 		}
+
+    if((millis() - t_start) >= timeout)
+    {
+      ret = 0;
+      goto exit_ja;
+    }
 		
 	}while(1);
 	
 exit_ja:	
 
 	GPIOA->ODR |= (1 << SPI1_SS);		
-		
+	return ret;
 }
