@@ -2,6 +2,7 @@
 
 // Private variables
 uint32_t led_millis = 0;
+uint32_t PD_refresh_millis = 0;
 uint8_t alive_fsm = 0;
 uint8_t app_fsm = 0;
 
@@ -86,6 +87,7 @@ void app_iol_aliveTask(){
 	
 	if((millis() - led_millis) > 100){
 		led_millis = millis();
+		
 		switch(alive_fsm){
 			case 0:// Status : IO-Link inactive
 				{
@@ -111,6 +113,15 @@ void app_iol_aliveTask(){
 	}
 }
 
+void app_iol_updatePDTask(){
+	if((millis() - PD_refresh_millis) > 1000){
+		PD_refresh_millis = millis();
+		if(iol_dl_getModeStatus() == DL_MODE_OP)
+			iol_al_updatePD();// Update PD
+	}
+
+}
+
 // Tasks and FSMs that runs this IO-Link device
 void app_runner(){
 	switch(app_fsm){
@@ -123,9 +134,8 @@ void app_runner(){
 		
 		case APP_RUN_STATE:// Check wake up current
 		{
-			iol_pl_pollRead();
-			iol_dl_poll();
-			iol_pl_pollWrite();
+			iol_al_poll();
+			app_iol_updatePDTask();
 			app_iol_aliveTask();
 		}
 		

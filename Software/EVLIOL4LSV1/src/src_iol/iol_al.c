@@ -1,6 +1,8 @@
 #include "iol_al.h"
 
+// Device's direct parameter data
 device_directparam_t device_dp_t = {
+	// Page 1
 	{
 		0,					// MasterCommand
 		0,					// MasterCycleTime
@@ -18,14 +20,16 @@ device_directparam_t device_dp_t = {
 		0						// SystemCommand
 	},
 	
+	// Page 2
 	{
 		0						// Device Specific profile
 	}
 	
 };
 
-uint16_t PD_test = 0xAA55;
+uint16_t PD_test = 0x0000;
 
+// Initialize the underlying layer (AL->DL->PL)
 void iol_al_init(){
 	iol_dl_init(
 		(uint8_t *)&device_dp_t.dp_p1_t,	
@@ -34,7 +38,16 @@ void iol_al_init(){
 	);
 }
 
+// Poll to run the IO-Link communication
+// called in app_device_impl.c
 void iol_al_poll(){
+	iol_pl_pollRead();
+	iol_dl_poll();
+	iol_pl_pollWrite();
+}
 
-
+// Demo used to update Process Data.
+void iol_al_updatePD(){
+	PD_test++;
+	iol_dl_updatePD();
 }

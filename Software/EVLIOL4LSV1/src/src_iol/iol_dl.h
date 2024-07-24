@@ -103,10 +103,7 @@ typedef struct __attribute__((packed)){
 	// Process Data
 	union{
 		uint16_t PD;
-		struct{
-			uint8_t PD_Lo	:8;
-			uint8_t PD_Hi :8;
-		};
+		uint8_t  PD_small[2];
 	};
 	
 	union{
@@ -144,6 +141,6 @@ void iol_dl_init(
 
 void iol_dl_poll();
 uint8_t iol_dl_getModeStatus();
-
+void iol_dl_updatePD();
 
 #endif

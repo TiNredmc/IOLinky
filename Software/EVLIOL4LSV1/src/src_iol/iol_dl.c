@@ -29,14 +29,14 @@ uint8_t master_cycle = 0;
 uint32_t timeout_counter = 0;
 
 // ISDU
-uint8_t ISDU_attempt_count = 0;
+//uint8_t ISDU_attempt_count = 0;
 uint8_t ISDU_data_pointer = 0;
 uint8_t ISDU_data_count = 0;
 uint8_t ISDU_in_buffer[240] = {0};
 uint8_t ISDU_out_buffer[240] = {0};
 uint8_t ISDU_RWflag = 0;
 uint8_t ISDU_16bIndex = 0;
-uint8_t ISDU_LenType = 0;
+//uint8_t ISDU_LenType = 0;
 
 // Process Data In
 uint8_t PD_In_count = 0;
@@ -70,7 +70,6 @@ void iol_dl_craftISDURead();
 void iol_dl_craftISDUWrite();
 
 
-
 // Initialize the DL (Actaully it just initialize PL)
 void iol_dl_init(
 	uint8_t *dev_param_1_ptr,
@@ -89,7 +88,7 @@ void iol_dl_init(
 }
 
 // Poll to receive and send IO-Link data
-// Called in app_device_impl.c in the polling manner
+// Called in iol_al_poll() in the polling manner
 void iol_dl_poll(){
 	
 	// If no communication for some period of time
@@ -127,7 +126,7 @@ void iol_dl_poll(){
 		}
 		break;
 		
-		case DL_MFSM_WFWR:
+		case DL_MFSM_WFWR:// Wait for reply done
 		{ // Wait until reply (write) is done.
 			if(iol_pl_checkWriteStatus()){
 				GPIOB->ODR &= ~(1 << IOL_mon);
@@ -135,7 +134,8 @@ void iol_dl_poll(){
 				// Switch mode if necessary
 				iol_dl_modeSwitcher();
 				
-				// Make sure we are ready to reply on next cycle.
+				// Make sure we are ready to reply on next cycle
+				// by updating the write buffer pointer.
 				switch(dl_mode_fsm){
 					case DL_MODE_STARTUP:
 					case DL_MODE_PREOP:
@@ -157,7 +157,7 @@ void iol_dl_poll(){
 		break;
 	}
 	
-	iol_dl_ISDUFSM();
+	iol_dl_ISDUFSM();// Run the ISDU decoder FSM.
 		
 }
 
@@ -430,7 +430,7 @@ void iol_dl_handleOPERATE(){
 		// Read mode
 		switch(iol_mt2_2.MCBit.CC){
 			case 0:// Process data
-				iol_dl_T22ProcessDataRead(iol_mt2_2.MCBit.ADDR);
+				//iol_dl_T22ProcessDataRead(iol_mt2_2.MCBit.ADDR);
 				break;
 			case 1:// Page data
 				iol_dl_T22ReadPage(iol_mt2_2.MCBit.ADDR);
@@ -465,8 +465,8 @@ void iol_dl_T22ProcessDataRead(uint8_t address){
 		// Valid : in address range
 		iol_mt2_2.OD = 0x00;
 		
-		iol_mt2_2.PD_Lo = *(pdIn_ptr + (2 * address));
-		iol_mt2_2.PD_Hi = *(pdIn_ptr + (2 * address) + 1);
+		iol_mt2_2.PD_small[0] = *(pdIn_ptr + (2 * address));
+		iol_mt2_2.PD_small[1] = *(pdIn_ptr + (2 * address) + 1);
 		
 		iol_mt2_2.CKS = 0x00;
 	}else{
@@ -752,12 +752,11 @@ void iol_dl_craftISDURead(){
 	ISDU_out_buffer[0] = 0xD0;// Default Read Response (+) I-service;
 	
 	switch(isdu_idx){
-		case 0x0010:// Vendor Name (64 Bytes) Mandatory! -> Works !
+		case 0x0010:// Vendor Name (64 Bytes) Mandatory!
 		{
-			ISDU_data_count = 64 + 3;
-			ISDU_out_buffer[0] |= 1;// Length
-			ISDU_out_buffer[1] = ISDU_data_count;
-			memcpy(ISDU_out_buffer+2, "KMITL", 5);
+			ISDU_data_count = 1 + 5 + 1;// I-service + text + checksum
+			ISDU_out_buffer[0] |= ISDU_data_count;// Length
+			memcpy(ISDU_out_buffer+1, "KMITL", 5);
 			iol_dl_xorISDU(ISDU_data_count);
 			
 		}
@@ -765,32 +764,28 @@ void iol_dl_craftISDURead(){
 		
 //		case 0x0011:// Vendor Text (64 Bytes)
 //		{
-//			ISDU_data_count = 64 + 3;
-//			ISDU_out_buffer[0] |= 1;// Length
-//			ISDU_out_buffer[1] = ISDU_data_count;
-//			memcpy(ISDU_out_buffer+2, "TinLethax", 9);
+//			ISDU_data_count = 1 + 9 + 1;// I-service + text + checksum
+//			ISDU_out_buffer[0] |= ISDU_data_count;// Length
+//			memcpy(ISDU_out_buffer+1, "TinLethax", 9);
 //			iol_dl_xorISDU(ISDU_data_count);
 //			
 //		}
 //		break;
 		
-		case 0x0012:// Product Name (64 Bytes) Mandatory
+		case 0x0012:// Product Name (64 Bytes) Mandatory!
 		{
-			ISDU_data_count = 64 + 3;
-			ISDU_out_buffer[0] |= 1;// Length
-			ISDU_out_buffer[1] = ISDU_data_count;
-			memcpy(ISDU_out_buffer+2, "IOLinky 1.0", 11);
+			ISDU_data_count = 1 + 11 + 1;// I-service + text + checksum
+			ISDU_out_buffer[0] |= ISDU_data_count;// Length
+			memcpy(ISDU_out_buffer+1, "IOLinky 1.0", 11);
 			iol_dl_xorISDU(ISDU_data_count);
-			GPIOB->ODR |= (1 << IOL_mon);
 		}
 		break;
 		
 		case 0x0013:// Product ID (64 Bytes)
 		{
-			ISDU_data_count = 64 + 3;
-			ISDU_out_buffer[0] |= 1;// Length
-			ISDU_out_buffer[1] = ISDU_data_count;
-			memcpy(ISDU_out_buffer+2, "10Linky", 7);
+			ISDU_data_count = 1 + 7 + 1;// I-service + text + checksum
+			ISDU_out_buffer[0] |= ISDU_data_count;// Length
+			memcpy(ISDU_out_buffer+1, "10Linky", 7);
 			iol_dl_xorISDU(ISDU_data_count);
 			
 		}
@@ -798,21 +793,19 @@ void iol_dl_craftISDURead(){
 		
 //		case 0x0014:// Product Text (64 Bytes)
 //		{
-//			ISDU_data_count = 64 + 3;
-//			ISDU_out_buffer[0] |= 1;// Length
-//			ISDU_out_buffer[1] = ISDU_data_count;
-//			memcpy(ISDU_out_buffer+2, "TinLethax", 9);
+//			ISDU_data_count = 1 + 9 + 1;// I-service + text + checksum
+//			ISDU_out_buffer[0] |= ISDU_data_count;// Length
+//			memcpy(ISDU_out_buffer+1, "TinLethax", 9);
 //			iol_dl_xorISDU(ISDU_data_count);
 //			
 //		}
 //		break;
 		
-		case 0x0015:// Serial Number (16 Bytes) -> Works !
+		case 0x0015:// Serial Number (16 Bytes) Mandatory!
 		{
-			ISDU_data_count = 16 + 3;
-			ISDU_out_buffer[0] |= 1;// Length
-			ISDU_out_buffer[1] = ISDU_data_count;
-			memcpy(ISDU_out_buffer+2, "1234ABCD", 8);
+			ISDU_data_count = 1 + 8 + 1;// I-service + text + checksum
+			ISDU_out_buffer[0] |= ISDU_data_count;// Length
+			memcpy(ISDU_out_buffer+1, "1234ABCD", 8);
 			iol_dl_xorISDU(ISDU_data_count);
 		}
 		break;
@@ -824,10 +817,15 @@ void iol_dl_craftISDURead(){
 }
 
 void iol_dl_craftISDUWrite(){
-	
+				GPIOB->ODR |= (1 << IOL_mon);
 }
 
 // Get current DL_mode
 uint8_t iol_dl_getModeStatus(){
 	return dl_mode_fsm;
+}
+
+void iol_dl_updatePD(){
+	iol_mt2_2.PD_small[1] = *(pdIn_ptr);
+  iol_mt2_2.PD_small[0] = *(pdIn_ptr + 1);
 }
