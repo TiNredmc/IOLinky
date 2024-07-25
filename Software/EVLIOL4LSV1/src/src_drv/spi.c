@@ -279,7 +279,7 @@ void spi_WriteOnceAndWrite(
 	
 uint8_t spi_l6364FastReadFF(
 	uint8_t *FR,
-	uint8_t *statusReg
+	uint8_t *statusReg,
   uint32_t timeout
 	){
 	uint8_t spi_fsm = 0;		
@@ -392,15 +392,16 @@ exit_ja:
 uint8_t spi_l6364FastWriteFF(
 		uint8_t count,
 		uint8_t *FR,
-		uint8_t *statusReg
+		uint8_t *statusReg,
     uint32_t timeout
 	){
-		
-  uint8_t ret = 0;  
+		  
+  uint8_t ret = count;  
 	uint8_t spi_fsm = 0;		
 	uint8_t ff_len = 0;
   uint32_t t_start = millis();
 
+  // Setting ret = count just in case the count > 0x0F results in count
 	if(count > 0x0F)
 			goto exit_ja;
 	
@@ -455,7 +456,7 @@ uint8_t spi_l6364FastWriteFF(
 				
 				if(count == 0)
         {
-          ret = 1;
+          ret = 0;
 					goto exit_ja;
         }
 				
@@ -475,7 +476,8 @@ uint8_t spi_l6364FastWriteFF(
 
     if((millis() - t_start) >= timeout)
     {
-      ret = 0;
+      // Returning remaining to transmit bytes
+      ret = count;
       goto exit_ja;
     }
 		
