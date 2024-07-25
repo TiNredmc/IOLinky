@@ -1,5 +1,4 @@
 #include "spi.h"
-#include "Systick_delay.h"
 
 void spi_init(){
 	RCC->APBENR2 |= RCC_APBENR2_SPI1EN;// Enable SPI1 peripheral clock.
