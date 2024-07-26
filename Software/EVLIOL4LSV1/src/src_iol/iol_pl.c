@@ -100,11 +100,10 @@ void iol_pl_pollRead(){
 void iol_pl_pollWrite(){
 	// Data write
 	if(write_request){
-		write_request = 0;
-		l6364_writeFIFOFast(
-			pl_tx_iol_byte,
-			write_buffer_ptr
-		);
+		if(l6364_writeFIFOFast(pl_tx_iol_byte, write_buffer_ptr) == 0)
+    {
+		  write_request = 0;
+    }
 	}
 }
 

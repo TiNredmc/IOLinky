@@ -6,6 +6,7 @@
 
 #include "stm32g071xx.h"
 #include "gpio_pinout.h"
+#include "Systick_delay.h"
 
 void spi_init();
 
@@ -29,13 +30,15 @@ void spi_WriteOnceAndWrite(
 
 uint8_t spi_l6364FastReadFF(
 	uint8_t *FR,
-	uint8_t *statusReg
+	uint8_t *statusReg,
+  uint32_t timeout
 	);
 
-void spi_l6364FastWriteFF(
+uint8_t spi_l6364FastWriteFF(
 		uint8_t count,
 		uint8_t *FR,
-		uint8_t *statusReg	
+		uint8_t *statusReg,
+    uint32_t timeout
 	);
 
 #endif
