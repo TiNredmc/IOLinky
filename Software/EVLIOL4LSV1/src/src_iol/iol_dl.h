@@ -101,11 +101,8 @@ typedef struct __attribute__((packed)){
 	uint8_t OD;// On-request Data
 	
 	// Process Data
-	union{
-		uint16_t PD;
-		uint8_t  PD_small[2];
-	};
-	
+	uint8_t  PD[2];
+
 	union{
 		uint8_t CKS;
 		struct{

@@ -40,6 +40,7 @@ uint8_t ISDU_16bIndex = 0;
 
 // Process Data In
 uint8_t PD_In_count = 0;
+uint8_t PD_setFlag = 0;
 
 // Private pointers
 uint8_t *direct_param_ptr;
@@ -60,6 +61,7 @@ void iol_dl_handlePREOPERATE();
 
 void iol_dl_handleOPERATE();
 void iol_dl_T22ProcessDataRead(uint8_t address);
+void iol_dl_updatePDData();
 void iol_dl_T22WritePage(uint8_t address);
 void iol_dl_T22ReadPage(uint8_t address);
 void iol_dl_T22WriteISDU(uint8_t address);
@@ -90,7 +92,6 @@ void iol_dl_init(
 // Poll to receive and send IO-Link data
 // Called in iol_al_poll() in the polling manner
 void iol_dl_poll(){
-	
 	// If no communication for some period of time
 	// Fall back to STARTUP to be ready for next initiation
 	// TODO : Use timer instead
@@ -116,8 +117,6 @@ void iol_dl_poll(){
 		{
 			if(!iol_pl_ReadAvailable())
 				break;
-			
-			timeout_counter = 0;
 			
 			// If read available. Read the data.
 			iol_dl_modeHandler();
@@ -158,7 +157,6 @@ void iol_dl_poll(){
 	}
 	
 	iol_dl_ISDUFSM();// Run the ISDU decoder FSM.
-		
 }
 
 // DL mode switcher handle FSM of IO-Link operation mode
@@ -425,7 +423,6 @@ void iol_dl_handlePREOPERATE(){
 
 // parsing M-sequence in OPERATE mode
 void iol_dl_handleOPERATE(){
-
 	if(iol_mt2_2.MCBit.RW){
 		// Read mode
 		switch(iol_mt2_2.MCBit.CC){
@@ -441,6 +438,13 @@ void iol_dl_handleOPERATE(){
 			default:
 				break;
 		}
+		
+		if(PD_setFlag == 1){
+			PD_setFlag = 0;
+			iol_mt2_2.PD[0] = *(pdIn_ptr+1);
+			iol_mt2_2.PD[1] = *pdIn_ptr;
+		}
+		
 	}else{
 		// Write mode
 		switch(iol_mt2_2.MCBit.CC){
@@ -459,28 +463,25 @@ void iol_dl_handleOPERATE(){
 	
 }
 
-void iol_dl_T22ProcessDataRead(uint8_t address){
-	
-	if(address < PD_In_count){
-		// Valid : in address range
-		iol_mt2_2.OD = 0x00;
-		
-		iol_mt2_2.PD_small[0] = *(pdIn_ptr + (2 * address));
-		iol_mt2_2.PD_small[1] = *(pdIn_ptr + (2 * address) + 1);
-		
-		iol_mt2_2.CKS = 0x00;
-	}else{
-		// Invalid : out off address range
-		iol_mt2_2.OD = 0x00;
-		
-		iol_mt2_2.PD = 0;
-		
-		iol_mt2_2.CKS = 0x40;// PD invalid
-	}
-	
-	iol_pl_update_WriteBuffer(&iol_mt2_2.OD);
-	iol_pl_WriteRequest(4);// Return Type 2_2 message reply
-}
+//void iol_dl_T22ProcessDataRead(uint8_t address){
+//	
+//	if(address < PD_In_count){
+//		// Valid : in address range
+//		iol_mt2_2.PD[0] = *(pdIn_ptr + (2 * address));
+//		iol_mt2_2.PD[1] = *(pdIn_ptr + (2 * address) + 1);
+//		
+//		iol_mt2_2.CKS = 0x00;
+//	}else{
+//		// Invalid : out off address range
+//		iol_mt2_2.PD[0] = 0;
+//		iol_mt2_2.PD[1] = 0;
+//		
+//		iol_mt2_2.CKS = 0x40;// PD invalid
+//	}
+//	
+//	iol_pl_update_WriteBuffer(iol_mt2_2.PD);
+//	iol_pl_WriteRequest(3);// Return Type 2_2 message reply
+//}
 
 // Handle Master "page" write request (TYPE 2_2 message)
 void iol_dl_T22WritePage(uint8_t address){
@@ -498,7 +499,7 @@ void iol_dl_T22WritePage(uint8_t address){
 		*(uint8_t *)(direct_param_ptr + (address & 0x0F)) = iol_mt2_2.OD;
 		
 		iol_mt2_2.CKS = 0x00;
-		iol_pl_update_WriteBuffer((uint8_t *)&iol_mt2_2.PD);
+		iol_pl_update_WriteBuffer(iol_mt2_2.PD);
 		iol_pl_WriteRequest(3);// Return Type 2_2 message reply
 }
 
@@ -531,7 +532,6 @@ void iol_dl_T22WriteISDU(uint8_t address){
 		
 	}
 	
-	
 	switch(address){
 			case 0x10:// Get the ISDU I-service and kick FSM into decode state
 				ISDU_in_buffer[0] = iol_mt2_2.OD;
@@ -547,9 +547,8 @@ void iol_dl_T22WriteISDU(uint8_t address){
 			break;
 	}
 
-
 	iol_mt2_2.CKS = 0x00;
-	iol_pl_update_WriteBuffer((uint8_t *)&iol_mt2_2.PD);
+	iol_pl_update_WriteBuffer(iol_mt2_2.PD);
 	iol_pl_WriteRequest(3);// Return Type 2_2 message reply
 }
 
@@ -578,6 +577,7 @@ void iol_dl_T22ReadISDU(uint8_t address){
 		case 0x12:// FlowCTRL IDLE2 (reserved for future use, no use here for now...)	
 			// Reply with OD = 0x00
 			iol_mt2_2.OD = 0x00;
+			timeout_counter = 0;
 			dl_isdu_fsm = 0;// Went back to idle state
 			break;
 		
@@ -826,6 +826,5 @@ uint8_t iol_dl_getModeStatus(){
 }
 
 void iol_dl_updatePD(){
-	iol_mt2_2.PD_small[1] = *(pdIn_ptr);
-  iol_mt2_2.PD_small[0] = *(pdIn_ptr + 1);
+	PD_setFlag = 1;
 }
