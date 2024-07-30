@@ -10,6 +10,7 @@
 // DL Main FSM enums
 enum DL_MAIN_FSM{
 	DL_MFSM_PR	= 0,// Wait for message read
+	DL_MFSM_WR,			// Write reply
 	DL_MFSM_WFWR		// Wait for reply done
 };
 

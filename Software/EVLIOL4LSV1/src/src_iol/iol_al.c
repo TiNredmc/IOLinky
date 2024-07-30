@@ -41,9 +41,7 @@ void iol_al_init(){
 // Poll to run the IO-Link communication
 // called in app_device_impl.c
 void iol_al_poll(){
-	iol_pl_pollRead();
 	iol_dl_poll();
-	iol_pl_pollWrite();
 }
 
 // Demo used to update Process Data.

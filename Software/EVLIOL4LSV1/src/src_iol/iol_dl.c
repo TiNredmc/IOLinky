@@ -61,6 +61,7 @@ void iol_dl_handlePREOPERATE();
 
 void iol_dl_handleOPERATE();
 void iol_dl_T22ProcessDataRead(uint8_t address);
+void iol_dl_T22ProcessDataWrite(uint8_t address);
 void iol_dl_updatePDData();
 void iol_dl_T22WritePage(uint8_t address);
 void iol_dl_T22ReadPage(uint8_t address);
@@ -88,7 +89,7 @@ void iol_dl_init(
 	pdIn_ptr = pd_in_ptr;
 	PD_In_count = pd_in_cnt;
 }
-
+	
 // Poll to receive and send IO-Link data
 // Called in iol_al_poll() in the polling manner
 void iol_dl_poll(){
@@ -98,6 +99,8 @@ void iol_dl_poll(){
 	timeout_counter++;
 	if(timeout_counter == 0x050000){
 		timeout_counter = 0;
+		
+		iol_pl_LinkEND();
 		
 		iol_pl_setMtype0();
 		iol_pl_updateBuffer(
@@ -115,12 +118,28 @@ void iol_dl_poll(){
 	switch(dl_main_fsm){
 		case DL_MFSM_PR:// Wait for UART message.
 		{
+			iol_pl_pollRead();
 			if(!iol_pl_ReadAvailable())
 				break;
 			
 			// If read available. Read the data.
 			iol_dl_modeHandler();
 			
+			dl_main_fsm = DL_MFSM_WR;
+		}
+		break;
+		
+		case DL_MFSM_WR:
+		{
+			if(dl_mode_fsm == DL_MODE_OP){
+				if(PD_setFlag == 1){
+					PD_setFlag = 0;
+					iol_mt2_2.PD[0] = *(pdIn_ptr+1);
+					iol_mt2_2.PD[1] = *pdIn_ptr;
+				}
+			}
+			
+			iol_pl_pollWrite();
 			dl_main_fsm = DL_MFSM_WFWR;
 		}
 		break;
@@ -232,6 +251,7 @@ void iol_dl_modeHandler(){
 		}
 		break;
 	}
+	
 }
 
 // parsing M-sequence in STARTUP mode
@@ -392,6 +412,7 @@ void iol_dl_T0ReadISDU(uint8_t address){
 void iol_dl_handlePREOPERATE(){
 	
 	if(iol_mt0.MCBit.RW){
+		// Read mode
 		switch(iol_mt0.MCBit.CC){
 			case 0:// Process data
 				break;
@@ -405,6 +426,7 @@ void iol_dl_handlePREOPERATE(){
 				break;
 		}
 	}else{
+		// Write mode
 		switch(iol_mt0.MCBit.CC){
 			case 0:// Process data
 				break;
@@ -418,11 +440,18 @@ void iol_dl_handlePREOPERATE(){
 				break;
 		}
 	}
-	
+
 }
 
 // parsing M-sequence in OPERATE mode
 void iol_dl_handleOPERATE(){
+	
+	// Always make sure that we get TYPE_2 message
+	if(iol_mt2_2.CKTBit.MT != 2){
+		//GPIOB->ODR |= (1 << IOL_mon);
+		return;
+	}
+	
 	if(iol_mt2_2.MCBit.RW){
 		// Read mode
 		switch(iol_mt2_2.MCBit.CC){
@@ -438,29 +467,25 @@ void iol_dl_handleOPERATE(){
 			default:
 				break;
 		}
-		
-		if(PD_setFlag == 1){
-			PD_setFlag = 0;
-			iol_mt2_2.PD[0] = *(pdIn_ptr+1);
-			iol_mt2_2.PD[1] = *pdIn_ptr;
-		}
-		
+			
 	}else{
 		// Write mode
 		switch(iol_mt2_2.MCBit.CC){
-			case 0:// Process data
-				break;
+//			case 0:// Process data
+//				//iol_dl_T22ProcessDataWrite(iol_mt2_2.MCBit.ADDR);
+//				break;
 			case 1:// Page data
 				iol_dl_T22WritePage(iol_mt2_2.MCBit.ADDR);
 				break;
 			case 3:// ISDU data
 				iol_dl_T22WriteISDU(iol_mt2_2.MCBit.ADDR);
+
 				break;
 			default:
 				break;
 		}
-	}
-	
+	}	
+
 }
 
 //void iol_dl_T22ProcessDataRead(uint8_t address){
@@ -482,6 +507,12 @@ void iol_dl_handleOPERATE(){
 //	iol_pl_update_WriteBuffer(iol_mt2_2.PD);
 //	iol_pl_WriteRequest(3);// Return Type 2_2 message reply
 //}
+
+void iol_dl_T22ProcessDataWrite(uint8_t address){
+	iol_mt2_2.CKS = 0x00;
+	iol_pl_update_WriteBuffer(&iol_mt2_2.CKS);
+	iol_pl_WriteRequest(1);// Return Type 2_2 message reply
+}
 
 // Handle Master "page" write request (TYPE 2_2 message)
 void iol_dl_T22WritePage(uint8_t address){
@@ -817,7 +848,7 @@ void iol_dl_craftISDURead(){
 }
 
 void iol_dl_craftISDUWrite(){
-				GPIOB->ODR |= (1 << IOL_mon);
+		
 }
 
 // Get current DL_mode
