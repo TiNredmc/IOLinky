@@ -114,7 +114,7 @@ void app_iol_aliveTask(){
 }
 
 void app_iol_updatePDTask(){
-	if((millis() - PD_refresh_millis) > 1000){
+	if((millis() - PD_refresh_millis) > 100){
 		PD_refresh_millis = millis();
 		if(iol_dl_getModeStatus() == DL_MODE_OP)
 			iol_al_updatePD();// Update PD
