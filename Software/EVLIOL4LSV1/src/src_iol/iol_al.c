@@ -28,12 +28,12 @@ device_directparam_t device_dp_t = {
 };
 
 uint16_t PD_test = 0x0000;
-
+uint16_t PD_cpy  = 0;
 // Initialize the underlying layer (AL->DL->PL)
 void iol_al_init(){
 	iol_dl_init(
 		(uint8_t *)&device_dp_t.dp_p1_t,	
-		(uint8_t *)&PD_test,
+		(uint8_t *)&PD_cpy,
 		1
 	);
 }
@@ -47,5 +47,6 @@ void iol_al_poll(){
 // Demo used to update Process Data.
 void iol_al_updatePD(){
 	PD_test++;
+	PD_cpy = PD_test;
 	iol_dl_updatePD();
 }
