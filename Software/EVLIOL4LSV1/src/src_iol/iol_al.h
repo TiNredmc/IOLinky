@@ -100,11 +100,6 @@ typedef struct __attribute__((packed)){
 	direct_param_p2_t dp_p2_t;
 }device_directparam_t;
 
-//typedef struct __attribute__((packed)){
-//	
-//};
-
-
 void iol_al_init();
 void iol_al_poll();
 void iol_al_updatePD();

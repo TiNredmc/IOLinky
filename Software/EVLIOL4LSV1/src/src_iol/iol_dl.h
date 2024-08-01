@@ -130,9 +130,20 @@ typedef struct{
 
 }iol_isdu_t;
 
+typedef struct __attribute__((packed)){
+	char *vendor_name;
+	char *vendor_text;
+	char *product_name;
+	char *product_id;
+	char *product_test;
+	char *serial_number;
+	char *hardware_revision;
+	char *firmware_revision;
+}isdu_data_t;
 
 void iol_dl_init(
 	uint8_t *dev_param_1_ptr,
+	isdu_data_t *isdu_data_ptr_t,
 	uint8_t *pd_in_ptr,
 	uint8_t pd_in_cnt
 	);
