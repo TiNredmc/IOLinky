@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<IODevice xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.io-link.com/IODD/2010/10" xsi:schemaLocation="http://www.io-link.com/IODD/2010/10 IODD1.1.xsd">
+  <DocumentInfo copyright="" releaseDate="2024-07-10" version="V1.1" />
+  
+  <ProfileHeader>
+    <ProfileIdentification>IO Device Profile</ProfileIdentification>
+    <ProfileRevision>1.1</ProfileRevision>
+    <ProfileName>Device Profile for IO Devices</ProfileName>
+    <ProfileSource>IO-Link Consortium</ProfileSource>
+    <ProfileClassID>Device</ProfileClassID>
+    <ISO15745Reference>
+      <ISO15745Part>1</ISO15745Part>
+      <ISO15745Edition>1</ISO15745Edition>
+      <ProfileTechnology>IODD</ProfileTechnology>
+    </ISO15745Reference>
+  </ProfileHeader>
+  
+  <ProfileBody>
+    <DeviceIdentity vendorId="65535" vendorName="KMITL" deviceId="1">
+      <VendorText textId="IOL_VendorText" />
+      <VendorUrl textId="IOL_VendorUrl" />
+      <VendorLogo name="kmitl-logo.png" />
+      <DeviceName textId="IOL_Device_Name" />
+      <DeviceFamily textId="IOL_DeviceFamily" />
+	  
+      <DeviceVariantCollection>
+        <DeviceVariant productId="10Linky" deviceIcon="KMITL-IOLinky-icon.png" deviceSymbol="KMITL-IOLinky-pic.png">
+          <Name textId="IOL_Device_Name" />
+          <Description textId="IOL_DeviceDescription" />
+        </DeviceVariant>
+      </DeviceVariantCollection>
+	  
+    </DeviceIdentity>
+    
+	<DeviceFunction>
+	
+      <Features blockParameter="false" dataStorage="false">
+      </Features>
+	  
+      <!-- <DatatypeCollection> -->
+        <!-- <Datatype id="D_ProcessDataOut" xsi:type="UIntegerT" bitLength="8" /> -->
+      <!-- </DatatypeCollection> -->
+	  
+      <VariableCollection>
+	  
+        <StdVariableRef id="V_DirectParameters_1" />
+        <StdVariableRef id="V_DirectParameters_2" />
+        <StdVariableRef id="V_SystemCommand">
+          <StdSingleValueRef value="129" />
+          <StdSingleValueRef value="130" />
+        </StdVariableRef>
+        <StdVariableRef id="V_VendorName" defaultValue="KMITL" />
+        <StdVariableRef id="V_VendorText" defaultValue="The Master of Innovation" />
+        <StdVariableRef id="V_ProductName" defaultValue="IO-Linky" />
+        <StdVariableRef id="V_ProductID" defaultValue="10Linky"/>
+        <StdVariableRef id="V_ProductText" defaultValue="TinLethax" />
+        <StdVariableRef id="V_SerialNumber" defaultValue="1234ABCD" />
+        <StdVariableRef id="V_HardwareRevision" defaultValue="EVLIOL" />
+        <StdVariableRef id="V_FirmwareRevision" defaultValue="EVL" />
+        <StdVariableRef id="V_ProcessDataInput" />
+        <StdVariableRef id="V_ProcessDataOutput" />
+		
+      </VariableCollection>
+	  
+      <ProcessDataCollection>
+        <ProcessData id="PD_ProcessDataDigitalInput">
+		
+          <ProcessDataIn id="PD_UINT16T" bitLength="16">
+            <Datatype xsi:type="UIntegerT" bitLength="16">
+				<!-- <SingleValue defaultValue="0"> -->
+					<!-- <Name textId="IOL_Data_0"/> -->
+				<!-- </SingleValue> -->
+			</Datatype>
+			
+            <Name textId="IOL_Data_0" />
+			
+          </ProcessDataIn>
+		  
+          <!-- <ProcessDataOut id="PD_ProcessDataOut2" bitLength="8"> -->
+          <!-- </ProcessDataOut> -->
+		  
+        </ProcessData>
+	
+      </ProcessDataCollection>
+	  
+      <EventCollection>
+        <StdEventRef code="0" />
+        <StdEventRef code="20496" />
+        <StdEventRef code="30480" />
+        <!-- <Event code="6145" type="Error"> -->
+          <!-- <Name textId="Event_Name_f4277304-cd0d-4dc3-9466-3b62aaac5822" /> -->
+        <!-- </Event> -->
+      </EventCollection>
+	  
+      <UserInterface>
+	  
+        <ProcessDataRefCollection>
+		
+          <ProcessDataRef processDataId="PD_UINT16T">
+            <ProcessDataInfo displayFormat="Hex" />
+          </ProcessDataRef>
+		  
+        </ProcessDataRefCollection>
+		
+        <MenuCollection>
+		  
+          <Menu id="ME_Ident_Observe">
+            <!--System Command-->
+            <VariableRef variableId="V_VendorName" />
+            <VariableRef variableId="V_VendorText" />
+            <VariableRef variableId="V_ProductName" />
+            <VariableRef variableId="V_ProductText" />
+            <VariableRef variableId="V_ProductID" />
+            <VariableRef variableId="V_SerialNumber" />
+          </Menu>
+		  
+		  <Menu id="ME_Ident_Xtra">
+            <!--System Command-->
+			<VariableRef variableId="V_VendorName" />
+            <VariableRef variableId="V_VendorText" />
+            <VariableRef variableId="V_ProductName" />
+            <VariableRef variableId="V_ProductText" />
+            <VariableRef variableId="V_ProductID" />
+            <VariableRef variableId="V_SerialNumber" />
+            <VariableRef variableId="V_FirmwareRevision" />
+            <VariableRef variableId="V_HardwareRevision" />
+            <RecordItemRef variableId="V_DirectParameters_1" subindex="8" displayFormat="Hex"/>
+            <RecordItemRef variableId="V_DirectParameters_1" subindex="9" displayFormat="Hex"/>
+            <RecordItemRef variableId="V_DirectParameters_1" subindex="10" displayFormat="Hex"/>
+            <RecordItemRef variableId="V_DirectParameters_1" subindex="11" displayFormat="Hex"/>
+            <RecordItemRef variableId="V_DirectParameters_1" subindex="12" displayFormat="Hex"/>
+            <VariableRef variableId="V_SystemCommand" />
+          </Menu>
+		  
+		  <Menu id="ME_Direct_Parameters">
+            <Name textId="IOL_M_DirectParam" />
+            <!--Mirror Input-->
+            <RecordItemRef variableId="V_DirectParameters_1" subindex="2" />
+            <RecordItemRef variableId="V_DirectParameters_1" subindex="3" />
+            <RecordItemRef variableId="V_DirectParameters_1" subindex="4" />
+            <RecordItemRef variableId="V_DirectParameters_1" subindex="6" />
+            <RecordItemRef variableId="V_DirectParameters_1" subindex="7" />
+          </Menu>
+		  
+		  <Menu id="M_Process_Data">
+            <Name textId="IOL_M_Process_Data" />
+            <VariableRef variableId="V_ProcessDataInput" />
+          </Menu>
+
+        </MenuCollection>
+		
+        <ObserverRoleMenuSet>
+          <IdentificationMenu menuId="ME_Ident_Observe" />
+          <ObservationMenu menuId="M_Process_Data" />
+        </ObserverRoleMenuSet>
+		
+        <MaintenanceRoleMenuSet>
+          <IdentificationMenu menuId="ME_Ident_Observe" />
+          <ParameterMenu menuId="ME_Direct_Parameters" />
+          <ObservationMenu menuId="M_Process_Data" />
+        </MaintenanceRoleMenuSet>
+		
+        <SpecialistRoleMenuSet>
+          <IdentificationMenu menuId="ME_Ident_Xtra" />
+          <ParameterMenu menuId="ME_Direct_Parameters" />
+          <ObservationMenu menuId="M_Process_Data" />
+        </SpecialistRoleMenuSet>
+		
+      </UserInterface>
+    </DeviceFunction>
+	
+  </ProfileBody>
+  
+  <CommNetworkProfile xsi:type="IOLinkCommNetworkProfileT" iolinkRevision="V1.1">
+    <TransportLayers>
+	
+      <PhysicalLayer bitrate="COM3" minCycleTime="4000" sioSupported="false" mSequenceCapability="1">
+        <Connection xsi:type="M12-4ConnectionT">
+          <ProductRef productId="10Linky" />
+          <Wire1 />
+          <Wire2 color="WH" function="NC" />
+          <Wire3 />
+          <Wire4 color="BK" function="C/Q" />
+        </Connection>
+      </PhysicalLayer>
+	  
+    </TransportLayers>
+	
+    <Test>
+      <Config1 index="128" testValue="0x2a,0x2a,0x2a,0x2a,0x2a,0x2a,0x2a" />
+      <Config2 index="256" testValue="0x2a,0x2a,0x2a,0x2a,0x2a,0x2a,0x2a" />
+      <Config3 index="129" testValue="0x2a,0x2a,0x2a,0x2a,0x2a,0x2a,0x2a,0x2a,0x2a,0x2a,0x2a,0x2a,0x2a,0x2a" />
+      <Config7 index="130">
+        <EventTrigger appearValue="01" disappearValue="02" />
+        <EventTrigger appearValue="11" disappearValue="12" />
+      </Config7>
+    </Test>
+	
+  </CommNetworkProfile>
+  
+  <ExternalTextCollection>
+
+    <PrimaryLanguage xml:lang="en">
+      <Text id="IOL_VendorText" value="The Master of Innovation" />
+      <Text id="IOL_Device_Name" value="IO-Linky" />
+      <Text id="IOL_DeviceFamily" value="IO-Link" />
+	  <Text id="IOL_DeviceDescription" value="Open source IO-Link-compatible software stack demo" />
+      <Text id="IOL_VendorUrl" value="https://www.kmitl.ac.th/" />
+	  <Text id="IOL_Data_0" value="Process Data 0" />
+	  
+	  <Text id="IOL_M_Process_Data" value="Process Data menu" />
+	  <Text id="IOL_M_DirectParam" value="Direct Parameter menu" />
+    </PrimaryLanguage>
+	
+  </ExternalTextCollection>
+  
+  <Stamp crc="0">
+    <Checker name="" version="V0.0.0.0" />
+  </Stamp>
+  
+</IODevice>
