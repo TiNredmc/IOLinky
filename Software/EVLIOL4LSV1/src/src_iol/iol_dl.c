@@ -127,10 +127,11 @@ void iol_dl_poll(){
 			if(!iol_pl_ReadAvailable())
 				break;
 			
+			dl_main_fsm = DL_MFSM_WR;
+			
 			// If read available. Read the data.
 			iol_dl_modeHandler();
 			
-			dl_main_fsm = DL_MFSM_WR;
 		}
 		break;
 		
@@ -139,8 +140,8 @@ void iol_dl_poll(){
 			if(dl_mode_fsm == DL_MODE_OP){
 				if(PD_setFlag == 1){
 					PD_setFlag = 0;
-					iol_mt2_2.PD[0] = *(pdIn_ptr+1);
 					iol_mt2_2.PD[1] = *pdIn_ptr;
+					iol_mt2_2.PD[0] = *(pdIn_ptr+1);
 				}
 			}
 			
@@ -460,9 +461,6 @@ void iol_dl_handleOPERATE(){
 	if(iol_mt2_2.MCBit.RW){
 		// Read mode
 		switch(iol_mt2_2.MCBit.CC){
-			case 0:// Process data
-				//iol_dl_T22ProcessDataRead(iol_mt2_2.MCBit.ADDR);
-				break;
 			case 1:// Page data
 				iol_dl_T22ReadPage(iol_mt2_2.MCBit.ADDR);
 				break;
@@ -470,15 +468,13 @@ void iol_dl_handleOPERATE(){
 				iol_dl_T22ReadISDU(iol_mt2_2.MCBit.ADDR);
 				break;
 			default:
+				dl_main_fsm = DL_MFSM_PR;
 				break;
 		}
 			
 	}else{
 		// Write mode
 		switch(iol_mt2_2.MCBit.CC){
-			case 0:// Process data
-				//iol_dl_T22ProcessDataWrite(iol_mt2_2.MCBit.ADDR);
-				break;
 			case 1:// Page data
 				iol_dl_T22WritePage(iol_mt2_2.MCBit.ADDR);
 				break;
@@ -487,6 +483,7 @@ void iol_dl_handleOPERATE(){
 
 				break;
 			default:
+				dl_main_fsm = DL_MFSM_PR;
 				break;
 		}
 	}	
@@ -513,11 +510,11 @@ void iol_dl_handleOPERATE(){
 //	iol_pl_WriteRequest(3);// Return Type 2_2 message reply
 //}
 
-void iol_dl_T22ProcessDataWrite(uint8_t address){
-	iol_mt2_2.CKS = 0x00;
-	iol_pl_update_WriteBuffer(&iol_mt2_2.CKS);
-	iol_pl_WriteRequest(1);// Return Type 2_2 message reply
-}
+//void iol_dl_T22ProcessDataWrite(uint8_t address){
+//	iol_mt2_2.CKS = 0x00;
+//	iol_pl_update_WriteBuffer(&iol_mt2_2.CKS);
+//	iol_pl_WriteRequest(1);// Return Type 2_2 message reply
+//}
 
 // Handle Master "page" write request (TYPE 2_2 message)
 void iol_dl_T22WritePage(uint8_t address){
