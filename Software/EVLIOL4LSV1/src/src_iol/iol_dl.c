@@ -32,8 +32,8 @@ uint32_t timeout_counter = 0;
 //uint8_t ISDU_attempt_count = 0;
 uint8_t ISDU_data_pointer = 0;
 uint8_t ISDU_data_count = 0;
-uint8_t ISDU_in_buffer[240] = {0};
-uint8_t ISDU_out_buffer[240] = {0};
+uint8_t ISDU_in_buffer[70] = {0};
+uint8_t ISDU_out_buffer[70] = {0};
 uint8_t ISDU_RWflag = 0;
 uint8_t ISDU_16bIndex = 0;
 //uint8_t ISDU_LenType = 0;
@@ -471,9 +471,9 @@ void iol_dl_handleOPERATE(){
 	}else{
 		// Write mode
 		switch(iol_mt2_2.MCBit.CC){
-//			case 0:// Process data
-//				//iol_dl_T22ProcessDataWrite(iol_mt2_2.MCBit.ADDR);
-//				break;
+			case 0:// Process data
+				//iol_dl_T22ProcessDataWrite(iol_mt2_2.MCBit.ADDR);
+				break;
 			case 1:// Page data
 				iol_dl_T22WritePage(iol_mt2_2.MCBit.ADDR);
 				break;
@@ -793,21 +793,22 @@ void iol_dl_craftISDURead(){
 		}
 		break;
 		
-//		case 0x0011:// Vendor Text (64 Bytes)
-//		{
-//			ISDU_data_count = 1 + 9 + 1;// I-service + text + checksum
-//			ISDU_out_buffer[0] |= ISDU_data_count;// Length
-//			memcpy(ISDU_out_buffer+1, "TinLethax", 9);
-//			iol_dl_xorISDU(ISDU_data_count);
-//			
-//		}
-//		break;
+		case 0x0011:// Vendor Text (64 Bytes)
+		{
+			ISDU_data_count = 2 + 24 + 1;// I-service + text + checksum
+			ISDU_out_buffer[0] |= 1;// Length
+			ISDU_out_buffer[1] = ISDU_data_count;
+			memcpy(ISDU_out_buffer+2, "The Master of Innovation", 24);
+			iol_dl_xorISDU(ISDU_data_count);
+			
+		}
+		break;
 		
 		case 0x0012:// Product Name (64 Bytes) Mandatory!
 		{
 			ISDU_data_count = 1 + 11 + 1;// I-service + text + checksum
 			ISDU_out_buffer[0] |= ISDU_data_count;// Length
-			memcpy(ISDU_out_buffer+1, "IOLinky 1.0", 11);
+			memcpy(ISDU_out_buffer+1, "IOLinky", 11);
 			iol_dl_xorISDU(ISDU_data_count);
 		}
 		break;
@@ -822,15 +823,15 @@ void iol_dl_craftISDURead(){
 		}
 		break;
 		
-//		case 0x0014:// Product Text (64 Bytes)
-//		{
-//			ISDU_data_count = 1 + 9 + 1;// I-service + text + checksum
-//			ISDU_out_buffer[0] |= ISDU_data_count;// Length
-//			memcpy(ISDU_out_buffer+1, "TinLethax", 9);
-//			iol_dl_xorISDU(ISDU_data_count);
-//			
-//		}
-//		break;
+		case 0x0014:// Product Text (64 Bytes)
+		{
+			ISDU_data_count = 1 + 9 + 1;// I-service + text + checksum
+			ISDU_out_buffer[0] |= ISDU_data_count;// Length
+			memcpy(ISDU_out_buffer+1, "TinLethax", 9);
+			iol_dl_xorISDU(ISDU_data_count);
+			
+		}
+		break;
 		
 		case 0x0015:// Serial Number (16 Bytes) Mandatory!
 		{
@@ -840,6 +841,33 @@ void iol_dl_craftISDURead(){
 			iol_dl_xorISDU(ISDU_data_count);
 		}
 		break;
+		
+		case 0x0016:// Hardware Revision 
+		{
+			ISDU_data_count = 1 + 6 + 1;// I-service + text + checksum
+			ISDU_out_buffer[0] |= ISDU_data_count;// Length
+			memcpy(ISDU_out_buffer+1, "EVLIOL", 6);
+			iol_dl_xorISDU(ISDU_data_count);
+		}
+		break;
+		
+		case 0x0017:// Firmware Revision 
+		{
+			ISDU_data_count = 1 + 3 + 1;// I-service + text + checksum
+			ISDU_out_buffer[0] |= ISDU_data_count;// Length
+			memcpy(ISDU_out_buffer+1, "EVL", 3);
+			iol_dl_xorISDU(ISDU_data_count);
+		}
+		break;
+		
+		case 0x0028:// Process Data input
+		{
+			ISDU_data_count = 1 + 2 + 1;// I-service + text + checksum
+			ISDU_out_buffer[0] |= ISDU_data_count;// Length
+			ISDU_out_buffer[1] = *(pdIn_ptr+1);
+			ISDU_out_buffer[2] = *pdIn_ptr;
+			iol_dl_xorISDU(ISDU_data_count);
+		}
 		
 		default:
 			break;
