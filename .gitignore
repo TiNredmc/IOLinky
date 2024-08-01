@@ -1,0 +1,8 @@
+*.d
+*.o
+*.map
+*.axf
+*.htm
+*.inp
+*.dep
+*.lnp
