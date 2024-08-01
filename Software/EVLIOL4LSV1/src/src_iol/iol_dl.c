@@ -672,12 +672,12 @@ void iol_dl_ISDUFSM(){
 				case 0x03:// Write 16 bit Index and Subindex
 					if(iol_iservice.length == 1){
 						iol_iservice.ExtLength = ISDU_in_buffer[1];
-						iol_iservice.Index[0] = ISDU_in_buffer[2];
-						iol_iservice.Index[1] = ISDU_in_buffer[3];
+						iol_iservice.Index[0] = ISDU_in_buffer[3];
+						iol_iservice.Index[1] = ISDU_in_buffer[2];
 						iol_iservice.Subindex = ISDU_in_buffer[4];
 					}else{
-						iol_iservice.Index[0] = ISDU_in_buffer[1];
-						iol_iservice.Index[1] = ISDU_in_buffer[2];
+						iol_iservice.Index[0] = ISDU_in_buffer[2];
+						iol_iservice.Index[1] = ISDU_in_buffer[1];
 						iol_iservice.Subindex = ISDU_in_buffer[3];
 					}		
 					ISDU_16bIndex = 1;
