@@ -24,6 +24,7 @@ uint8_t dl_isdu_fsm = 0;
 // DL_mode related
 uint8_t master_cmd = 0;
 uint8_t master_cycle = 0;
+uint8_t system_cmd = 0;
 
 // IO-Link comm timeout counter
 uint32_t timeout_counter = 0;
@@ -31,6 +32,7 @@ uint32_t timeout_counter = 0;
 // ISDU
 //uint8_t ISDU_attempt_count = 0;
 uint8_t ISDU_data_pointer = 0;
+uint8_t ISDU_data_offset_index	= 0;
 uint8_t ISDU_data_count = 0;
 uint8_t ISDU_in_buffer[70] = {0};
 uint8_t ISDU_out_buffer[70] = {0};
@@ -648,8 +650,10 @@ void iol_dl_ISDUFSM(){
 					if(iol_iservice.length == 1){
 						iol_iservice.ExtLength = ISDU_in_buffer[1];
 						iol_iservice.Index[0] = ISDU_in_buffer[2];
+						ISDU_data_offset_index = 3;
 					}else{
 						iol_iservice.Index[0] = ISDU_in_buffer[1];
+						ISDU_data_offset_index = 2;
 					}	
 					
 					ISDU_16bIndex = 0;
@@ -661,9 +665,11 @@ void iol_dl_ISDUFSM(){
 						iol_iservice.ExtLength = ISDU_in_buffer[1];
 						iol_iservice.Index[0] = ISDU_in_buffer[2];
 						iol_iservice.Subindex = ISDU_in_buffer[3];
+						ISDU_data_offset_index = 4;
 					}else{
 						iol_iservice.Index[0] = ISDU_in_buffer[1];
 						iol_iservice.Subindex = ISDU_in_buffer[2];
+						ISDU_data_offset_index = 3;
 					}	
 					ISDU_16bIndex = 0;
 					ISDU_RWflag = 0;
@@ -675,10 +681,12 @@ void iol_dl_ISDUFSM(){
 						iol_iservice.Index[0] = ISDU_in_buffer[3];
 						iol_iservice.Index[1] = ISDU_in_buffer[2];
 						iol_iservice.Subindex = ISDU_in_buffer[4];
+						ISDU_data_offset_index = 5;
 					}else{
 						iol_iservice.Index[0] = ISDU_in_buffer[2];
 						iol_iservice.Index[1] = ISDU_in_buffer[1];
 						iol_iservice.Subindex = ISDU_in_buffer[3];
+						ISDU_data_offset_index = 4;
 					}		
 					ISDU_16bIndex = 1;
 					ISDU_RWflag = 0;
@@ -808,7 +816,7 @@ void iol_dl_craftISDURead(){
 		{
 			ISDU_data_count = 1 + 11 + 1;// I-service + text + checksum
 			ISDU_out_buffer[0] |= ISDU_data_count;// Length
-			memcpy(ISDU_out_buffer+1, "IOLinky", 11);
+			memcpy(ISDU_out_buffer+1, "IOLinky", 7);
 			iol_dl_xorISDU(ISDU_data_count);
 		}
 		break;
@@ -876,7 +884,32 @@ void iol_dl_craftISDURead(){
 }
 
 void iol_dl_craftISDUWrite(){
-		
+	uint16_t isdu_idx = 0;
+	
+	// Parse Index
+	if(ISDU_16bIndex == 1){
+		// 16 Bit Index
+		isdu_idx = (uint16_t)(
+			(iol_iservice.Index[0] << 8) |
+			iol_iservice.Index[1]
+		);
+	}else{
+		// 8 bit index
+		isdu_idx = iol_iservice.Index[0];
+	}
+	
+	ISDU_out_buffer[0] = 0x05;// Default write Response (+) I-service;
+	
+	switch(isdu_idx){
+		case 0x0002:// System command
+		{
+			system_cmd = ISDU_in_buffer[ISDU_data_offset_index];
+			ISDU_data_offset_index = 0;
+		}
+
+	
+	}
+	
 }
 
 // Get current DL_mode
