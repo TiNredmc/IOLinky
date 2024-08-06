@@ -129,28 +129,14 @@ void iol_dl_poll(){
 			if(!iol_pl_ReadAvailable())
 				break;
 			
-			dl_main_fsm = DL_MFSM_WR;
+			dl_main_fsm = DL_MFSM_WFWR;
 			
 			// If read available. Read the data.
 			iol_dl_modeHandler();
 			
 		}
 		break;
-		
-		case DL_MFSM_WR:
-		{
-			if(dl_mode_fsm == DL_MODE_OP){
-				if(PD_setFlag == 1){
-					PD_setFlag = 0;
-					iol_mt2_2.PD[1] = *pdIn_ptr;
-					iol_mt2_2.PD[0] = *(pdIn_ptr+1);
-				}
-			}
-			
-			dl_main_fsm = DL_MFSM_WFWR;
-		}
-		break;
-		
+
 		case DL_MFSM_WFWR:// Wait for reply done
 		{ 
 			iol_pl_pollWrite();
@@ -452,8 +438,8 @@ void iol_dl_T0Xor(){
 		((iol_cks_t.CKS_6 ^ iol_cks_t.CKS_7)	<< 3);	
 	
 	iol_mt0.CKSBit.CKS = 
-		(temp_xor_odd 	<< 6) |
-		(temp_xor_even 	<< 5) |
+		(temp_xor_odd 	<< 5) |
+		(temp_xor_even 	<< 4) |
 		(temp_xor_pair 	& 0x0F);
 }
 
@@ -533,6 +519,12 @@ void iol_dl_handleOPERATE(){
 		}
 	}
 
+	if(PD_setFlag == 1){
+		PD_setFlag = 0;
+		iol_mt2_2.PD[1] = *pdIn_ptr;
+		iol_mt2_2.PD[0] = *(pdIn_ptr+1);
+	}
+	
 	iol_dl_T22Xor();
 }
 
@@ -715,9 +707,9 @@ void iol_dl_T22Xor(){
 		((iol_cks_t.CKS_4 ^ iol_cks_t.CKS_5)	<< 2)	|
 		((iol_cks_t.CKS_6 ^ iol_cks_t.CKS_7)	<< 3);	
 	
-	iol_mt0.CKSBit.CKS = 
-		(temp_xor_odd 	<< 6) |
-		(temp_xor_even 	<< 5) |
+	iol_mt2_2.CKSBit.CKS = 
+		(temp_xor_odd 	<< 5) |
+		(temp_xor_even 	<< 4) |
 		(temp_xor_pair 	& 0x0F);
 }
 
