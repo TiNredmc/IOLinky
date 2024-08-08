@@ -133,7 +133,6 @@ void iol_dl_poll(){
 			
 			// If read available. Read the data.
 			iol_dl_modeHandler();
-			
 		}
 		break;
 
@@ -143,7 +142,6 @@ void iol_dl_poll(){
 			// Wait until reply (write) is done.
 			if(iol_pl_checkWriteStatus()){
 				//GPIOB->ODR &= ~(1 << IOL_mon);
-
 				// Switch mode if necessary
 				iol_dl_modeSwitcher();
 				

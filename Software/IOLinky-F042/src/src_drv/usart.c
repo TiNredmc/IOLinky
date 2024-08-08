@@ -56,6 +56,7 @@ void usart_initIOLink(
 		USART_CR1_PCE			|	// Enable parity (Event parity)
 		USART_CR1_PEIE		|	// Enable Parity error interrupt
 		USART_CR1_RXNEIE	|	// Enable RX not empty interrupt
+		USART_CR1_TE			| // Enable TX
 		USART_CR1_RE			;	// Enable RX
 	
 //	USART2->CR2	|=
@@ -93,17 +94,11 @@ void usart_initIOLink(
 	
 void uart_enableTX(){
 	USART2->CR1 &= ~USART_CR1_RE;//  Disable Receiver
-	
-	// Enable Transmitter
-	USART2->CR1 |= USART_CR1_TE;
 	GPIOA->ODR |= (1 << EN_pin);
 }
 
 void uart_disableTX(){
-	// Disable Transmitter
-	USART2->CR1 &= ~USART_CR1_TE;
 	GPIOA->ODR &= ~(1 << EN_pin);
-	
 	USART2->CR1 |= USART_CR1_RE;//  Enable Receiver
 }
 
@@ -141,7 +136,7 @@ uint8_t uart_pollWrite(){
 		
 		case 1:// Check if TX is empty and TX is enabled
 		{
-			if((USART2->ISR & (USART_ISR_TXE | USART_ISR_TEACK)))
+			if((USART2->ISR & (USART_ISR_TXE)))
 					uart_tx_fsm = 2;
 		}
 		break;
