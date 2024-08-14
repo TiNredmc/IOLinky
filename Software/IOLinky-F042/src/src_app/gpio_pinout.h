@@ -9,7 +9,6 @@
 #define OL_pin			5
 #define EN_pin			6
 
-
 // Port B
 #define IOL_mon			1
 
