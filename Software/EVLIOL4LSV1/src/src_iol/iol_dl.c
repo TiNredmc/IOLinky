@@ -1090,7 +1090,7 @@ void iol_dl_craftISDUWrite(){
 			system_cmd = ISDU_in_buffer[ISDU_data_offset_index];
 			ISDU_data_offset_index = 0;
 		}
-
+		break;
 	
 	}
 	
