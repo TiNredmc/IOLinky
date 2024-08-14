@@ -53,7 +53,8 @@ void usart_initIOLink(
 	
 	USART2->CR1 |=
 		USART_CR1_OVER8		|	// x8 oversampling
-		USART_CR1_PCE			|	// Enable parity (Event parity)
+		USART_CR1_M0			|	// 9th bit for the parity
+		USART_CR1_PCE			|	// Enable parity (Even parity)
 		USART_CR1_PEIE		|	// Enable Parity error interrupt
 		USART_CR1_RXNEIE	|	// Enable RX not empty interrupt
 		USART_CR1_TE			| // Enable TX
@@ -154,7 +155,7 @@ uint8_t uart_pollWrite(){
 		
 		case 3:
 		{
-			if((USART2->ISR & USART_ISR_TXE)){
+			if((USART2->ISR & USART_ISR_TC)){
 				tx_size--;
 				if(tx_size == 0){
 					uart_disableTX();
