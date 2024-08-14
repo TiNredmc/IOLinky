@@ -20,9 +20,9 @@ device_directparam_t device_dp_t = {
 		0						// SystemCommand
 	},
 	
-	// Page 2
+	// Page 2 // Device Specific profile
 	{
-		0						// Device Specific profile
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16					
 	}
 	
 };
@@ -30,7 +30,7 @@ device_directparam_t device_dp_t = {
 isdu_data_t isdu_d_t = {
 	"KMITL",
 	"The Master of Innivation",
-	"IOLinky",
+	"IOLinkyF042",
 	"10Linky",
 	"TinLethax",
 	"1234ABCD",
@@ -43,7 +43,7 @@ uint16_t PD_cpy  = 0;
 // Initialize the underlying layer (AL->DL->PL)
 void iol_al_init(){
 	iol_dl_init(
-		(uint8_t *)&device_dp_t.dp_p1_t,	
+		(uint8_t *)&device_dp_t,	
 		&isdu_d_t,
 		(uint8_t *)&PD_cpy,
 		1

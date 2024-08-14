@@ -295,11 +295,10 @@ void iol_dl_T0WritePage(uint8_t address){
 				master_cycle = iol_mt0.OD;
 				break;
 			default:
-				return;
+				break;
 		}	
-		
-		if(address < 0x10)
-			*(uint8_t *)(direct_param_ptr + (address & 0x0F)) = iol_mt0.OD;
+
+		*(uint8_t *)(direct_param_ptr + (address & 0x1F)) = iol_mt0.OD;
 		
 		iol_mt0.CKS = 0x00;
 		iol_pl_update_WriteBuffer(&iol_mt0.CKS);
@@ -308,11 +307,10 @@ void iol_dl_T0WritePage(uint8_t address){
 
 // Handle Master "page" read request (TYPE 0 message)
 void iol_dl_T0ReadPage(uint8_t address){	
-	if(address < 0x10)
-		iol_mt0.OD = *(uint8_t *)(direct_param_ptr + (address & 0x0F)); 
+
+	iol_mt0.OD = *(uint8_t *)(direct_param_ptr + (address & 0x1F));
 	
 	iol_mt0.CKS = 0x00;
-	
 	iol_pl_WriteRequest(2);// Return Type 0 message reply
 }
 

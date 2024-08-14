@@ -91,8 +91,8 @@ typedef struct __attribute__((packed)){
 	uint8_t SystemCommand;
 }direct_param_p1_t;
 
-typedef struct{
-	uint8_t data[0x0F];
+typedef struct __attribute__((packed)){
+	uint8_t data[16];
 }direct_param_p2_t;
 
 typedef struct __attribute__((packed)){
