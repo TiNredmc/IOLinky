@@ -17,47 +17,48 @@ void app_initGPIO(){
 	// Init SPI pins
 	GPIOA->MODER &= 
 		~(
-		(3 << KEY0_pin * 2) 	|
-		(3 << KEY1_pin * 2) 	|
-		(3 << USART2_TX * 2) 	|
-		(3 << USART2_RX * 2) 	| 
-		(3 << OL_pin * 2) 		|
-		(3 << EN_pin	* 2)
+		(3 << (KEY0_pin * 2)) 	|
+		(3 << (KEY1_pin * 2)) 	|
+		(3 << (USART2_TX * 2)) 	|
+		(3 << (USART2_RX * 2)) 	| 
+		(3 << (OL_pin * 2)) 		|
+		(3 << (EN_pin	* 2))
 		);
 
 	GPIOA->MODER |= 
-		(0 << KEY0_pin * 2) 	|	// Input floating
-		(0 << KEY1_pin * 2) 	|	// Input floating
-		(2 << USART2_TX * 2) 	| // AF1
-		(2 << USART2_RX * 2) 	| // AF1
-		(0 << OL_pin * 2) 		| // Input floating
-		(1 << EN_pin	* 2);			// Output OD Pull-up
+		(0 << (KEY0_pin * 2)) 	|	// Input floating
+		(0 << (KEY1_pin * 2)) 	|	// Input floating
+		(2 << (USART2_TX * 2)) 	| // AF1
+		(2 << (USART2_RX * 2)) 	| // AF1
+		(0 << (OL_pin * 2)) 		| // Input 
+		(1 << (EN_pin	* 2));			// Output OD Pull-up
 	
 	GPIOA->OTYPER |= 
-		(1 << EN_pin);					// Open-drain output
+		(0 << EN_pin);					// Open-drain output
 	
 	GPIOA->OSPEEDR |= 
-		(3 << USART2_TX * 2) 	|
-		(3 << USART2_RX * 2)	|
-		(3 << EN_pin	* 2);			// High speed
+		(3 << (USART2_TX * 2)) 	|
+		(3 << (USART2_RX * 2))	|
+		(3 << (EN_pin	* 2));			// High speed
 	
 	GPIOA->PUPDR |=
-		(1 << EN_pin *	2);			// R-pull up on the OD pin
+		//(1 << (EN_pin * 2))		|	// R-pull up on the OD pin
+		(1 << (OL_pin *	2));		// R-pull up on the input pin	
 	
 	GPIOA->ODR &= ~(1 << EN_pin);// Disable Transmitter
 	
 	GPIOA->AFR[0] |= 
-		(1 << USART2_TX * 4)	|
-		(1 << USART2_RX * 4);
+		(1 << (USART2_TX * 4))	|
+		(1 << (USART2_RX * 4));
 
 	// IO-Link monitoring LED
 	GPIOB->MODER &=
 		~(
-		(3 << IOL_mon * 2)
+		(3 << (IOL_mon * 2))
 		);
 		
-	GPIOB->MODER |= (1 << IOL_mon * 2);
-	GPIOB->OSPEEDR |= (3 << IOL_mon *2); 
+	GPIOB->MODER |= (1 << (IOL_mon * 2));
+	GPIOB->OSPEEDR |= (3 << (IOL_mon *2)); 
 
 }
 
