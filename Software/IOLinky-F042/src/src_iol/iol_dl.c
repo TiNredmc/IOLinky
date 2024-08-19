@@ -106,7 +106,7 @@ void iol_dl_poll(){
 	// Fall back to STARTUP to be ready for next initiation
 	// Timeout at 48Mhz -O balance ~1 second-ish
 	timeout_counter++;
-	if(timeout_counter == 0x6FA57){
+	if(timeout_counter == 0x8FA57){
 		timeout_counter = 0;
 		
 		iol_pl_setMtype0();
@@ -249,6 +249,12 @@ void iol_dl_modeHandler(){
 
 // parsing M-sequence in STARTUP mode
 void iol_dl_handleSTARTUP(){
+	
+	// Always make sure that we get TYPE_0 message
+	if(iol_mt0.CKTBit.MT != 0){
+		return;
+	}
+	
 	
 	if(iol_mt0.MCBit.RW){
 		// Read mode
@@ -444,6 +450,11 @@ void iol_dl_T0Xor(){
 // we can easily (lazily) share the R/W functions
 void iol_dl_handlePREOPERATE(){
 	
+	// Always make sure that we get TYPE_0 message
+	if(iol_mt0.CKTBit.MT != 0){
+		return;
+	}
+	
 	if(iol_mt0.MCBit.RW){
 		// Read mode
 		switch(iol_mt0.MCBit.CC){
@@ -482,7 +493,6 @@ void iol_dl_handleOPERATE(){
 	
 	// Always make sure that we get TYPE_2 message
 	if(iol_mt2_2.CKTBit.MT != 2){
-		//GPIOB->ODR |= (1 << IOL_mon);
 		return;
 	}
 	
