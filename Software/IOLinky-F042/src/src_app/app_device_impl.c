@@ -107,8 +107,11 @@ void app_iol_aliveTask(){
 int16_t temp_adc_read = 0;
 
 void app_iol_updatePDTask(){
-	if(temp_adc_read = adc_readScheduled(6), temp_adc_read > -1){
-			iol_al_updatePD(temp_adc_read);// Update PD
+	if((millis() - PD_refresh_millis) > 20){
+		PD_refresh_millis = millis();
+		if(temp_adc_read = adc_readScheduled(6), temp_adc_read > -1){
+				iol_al_updatePD(temp_adc_read);// Update PD
+		}
 	}
 }
 
