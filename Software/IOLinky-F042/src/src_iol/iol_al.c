@@ -34,11 +34,10 @@ isdu_data_t isdu_d_t = {
 	"10Linky",
 	"TinLethax",
 	"1234ABCD",
-	"EVLIOL",
-	"EVL"
+	"F042_6362",
+	"F042"
 };
 
-uint16_t PD_test = 0x0000;
 uint16_t PD_cpy  = 0;
 // Initialize the underlying layer (AL->DL->PL)
 void iol_al_init(){
@@ -57,8 +56,7 @@ void iol_al_poll(){
 }
 
 // Demo used to update Process Data.
-void iol_al_updatePD(){
-	PD_test++;
-	PD_cpy = PD_test;
+void iol_al_updatePD(uint16_t pd_val){
+	PD_cpy = pd_val;
 	iol_dl_updatePD();
 }

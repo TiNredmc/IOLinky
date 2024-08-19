@@ -97,7 +97,7 @@
         <ProcessDataRefCollection>
 		
           <ProcessDataRef processDataId="PD_UINT16T">
-            <ProcessDataInfo unitCode="1056" gradient="0.1" displayFormat="Dec.1"/>
+            <ProcessDataInfo unitCode="1243" gradient="0.8057" displayFormat="Dec.1"/>
           </ProcessDataRef>
 		  
         </ProcessDataRefCollection>

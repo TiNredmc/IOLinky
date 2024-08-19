@@ -17,8 +17,6 @@ void app_initGPIO(){
 	// Init SPI pins
 	GPIOA->MODER &= 
 		~(
-		(3 << (KEY0_pin * 2)) 	|
-		(3 << (KEY1_pin * 2)) 	|
 		(3 << (USART2_TX * 2)) 	|
 		(3 << (USART2_RX * 2)) 	| 
 		(3 << (OL_pin * 2)) 		|
@@ -26,15 +24,16 @@ void app_initGPIO(){
 		);
 
 	GPIOA->MODER |= 
-		(0 << (KEY0_pin * 2)) 	|	// Input floating
-		(0 << (KEY1_pin * 2)) 	|	// Input floating
+		(0 << (OL_pin * 2)) 		| // Input 
 		(2 << (USART2_TX * 2)) 	| // AF1
 		(2 << (USART2_RX * 2)) 	| // AF1
-		(0 << (OL_pin * 2)) 		| // Input 
-		(1 << (EN_pin	* 2));			// Output OD Pull-up
+		(1 << (EN_pin	* 2))			| // Output OD Pull-up
+		(3 << (Isense_pin * 2))	|	// Analog input
+		(3 << (V5sense_pin * 2))|	// Analog input
+		(3 << (V24sense_pin * 2)); // Analog input
 	
-	GPIOA->OTYPER |= 
-		(0 << EN_pin);					// Open-drain output
+//	GPIOA->OTYPER |= 
+//		(1 << EN_pin);					// Open-drain output
 	
 	GPIOA->OSPEEDR |= 
 		(3 << (USART2_TX * 2)) 	|
@@ -67,6 +66,7 @@ void app_initIO(){
 	clk_initSysClk();								// Setup system clock
 	systick_init(F_CPU, 1000);			// Setup 1000 systick
 	app_initGPIO();
+	adc_init();
 }
 
 // Task to serve alive LED status.
@@ -104,13 +104,12 @@ void app_iol_aliveTask(){
 	}
 }
 
-void app_iol_updatePDTask(){
-	if((millis() - PD_refresh_millis) > 100){
-		PD_refresh_millis = millis();
-		if(iol_dl_getModeStatus() == DL_MODE_OP)
-			iol_al_updatePD();// Update PD
-	}
+int16_t temp_adc_read = 0;
 
+void app_iol_updatePDTask(){
+	if(temp_adc_read = adc_readScheduled(6), temp_adc_read > -1){
+			iol_al_updatePD(temp_adc_read);// Update PD
+	}
 }
 
 // Tasks and FSMs that runs this IO-Link device

@@ -102,6 +102,6 @@ typedef struct __attribute__((packed)){
 
 void iol_al_init();
 void iol_al_poll();
-void iol_al_updatePD();
+void iol_al_updatePD(uint16_t pd_val);
 
 #endif

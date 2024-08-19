@@ -5,6 +5,7 @@
 
 #include "clk.h"
 #include "Systick_delay.h"
+#include "adc.h"
 
 #include "iol_l6362.h"
 
