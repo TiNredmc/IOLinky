@@ -18,13 +18,18 @@ void usart_initIOLink(
 	uint8_t *write_ptr				// TX buffer
 	);
 
-void uart_writeRequest(
+void usart_writeRequest(
 	uint8_t count);
-uint8_t uart_pollWrite();
+uint8_t usart_pollWrite();
 
 uint8_t usart_getReadIdx();
 void usart_resetReadIdx();
 
 uint8_t usart_getPEStatus();
+
+void usart_dmaWriteStart(
+	uint8_t *data_ptr, 
+	uint8_t data_len
+	);
 
 #endif
