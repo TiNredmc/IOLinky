@@ -113,7 +113,7 @@ uint8_t l6362_writeFIFO(
 		case 0:
 		{
 			if(count > 0){
-				uart_writeRequest(count);
+				usart_writeRequest(count);
 				memcpy(
 					l6362_write_fifo, 
 					input_ptr, 
@@ -128,7 +128,7 @@ uint8_t l6362_writeFIFO(
 	
 		case 1:
 		{
-			ret = uart_pollWrite();
+			ret = usart_pollWrite();
 			if(ret == 0){
 				write_fifo_fsm = 0;
 			}
