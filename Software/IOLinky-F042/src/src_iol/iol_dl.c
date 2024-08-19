@@ -1171,7 +1171,8 @@ void iol_dl_craftISDUWrite(){
 		isdu_idx = iol_iservice.Index[0];
 	}
 	
-	ISDU_out_buffer[0] = 0x05;// Default write Response (+) I-service;
+	ISDU_data_count = 2;
+	ISDU_out_buffer[0] = 0x50 | 2;// Default write Response (+) I-service;
 	
 	switch(isdu_idx){
 		case 0x0002:// System command
@@ -1182,7 +1183,9 @@ void iol_dl_craftISDUWrite(){
 		break;
 	
 	}
-	
+	// Calculate checksum
+	ISDU_out_buffer[1] = 0x00;
+	ISDU_out_buffer[1] = ISDU_out_buffer[0] ^ ISDU_out_buffer[1];
 }
 
 // Get current DL_mode
