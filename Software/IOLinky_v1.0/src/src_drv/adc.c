@@ -1,7 +1,7 @@
 #include "adc.h"
 
 // Private pointers
-uint16_t *adc_buffer_ptr;
+uint32_t *adc_buffer_ptr;
 
 // Private variables
 volatile uint32_t dma_stat = 0;
@@ -22,7 +22,7 @@ void DMA_Channel0_IRQHandler(void){
 }
 
 void adc_initScanDMA(
-	uint16_t* adc_ptr
+	uint32_t* adc_ptr
 	){
 		
 	if(adc_ptr == 0)
@@ -30,7 +30,7 @@ void adc_initScanDMA(
 	
 	adc_buffer_ptr = adc_ptr;
 		
-	RCU_AHBEN |= (1 << 9); // Enable DMA Clock
+	RCU_AHBEN |= 1; // Enable DMA Clock
 	RCU_APB2EN |= (1 << 9);// Enable ADC Clock
 	
 	ADC_CTL0 |= (1 << 8);// ADC Scan mode
@@ -38,7 +38,7 @@ void adc_initScanDMA(
 	ADC_RSQ0 = (3 << 20);// Total scan of 3 channels
 	
 	// Scan sequence
-	ADC_RSQ2 |=
+	ADC_RSQ2 =
 		(Isense_pin 	<< 0)		|
 		(V5sense_pin 	<< 5)		|
 		(V24sense_pin << 10)	;
@@ -69,7 +69,7 @@ void adc_initScanDMA(
 	DMA_CH0PADDR = (uint32_t)(&ADC_RDATA);
 	
 	// Config Memory address (point to adc data holding struct)
-	DMA_CH0MADDR = (uint32_t)(&adc_buffer_ptr);
+	DMA_CH0MADDR = (uint32_t)((uint32_t *)adc_buffer_ptr);
 	
 	// Data count is 3
 	DMA_CH0CNT = 3;
@@ -82,7 +82,7 @@ void adc_initScanDMA(
 		(1 << 5)			| // Circular mode
 		(1 << 1)			; // Channel full xfer interrupt 
 		
-	DMA_CH0CNT |= 1;// Enable DMA CH0
+	DMA_CH0CTL |= 1;// Enable DMA CH0
 
 	NVIC_SetPriority(DMA_Channel0_IRQn, 1);
 	NVIC_EnableIRQ(DMA_Channel0_IRQn);
