@@ -190,6 +190,39 @@ typedef struct __attribute__((packed)){
 	char *firmware_revision;
 }isdu_data_t;
 
+// Extern for msg handler
+extern iol_mtype_0_t iol_mt0;
+extern iol_mtype_2_2_t iol_mt2_2;
+extern iol_mtype_2_V_8PDI_t iol_mt2_v;
+extern iol_mtype_cks_t iol_cks_t;
+
+extern uint8_t dl_main_fsm;
+extern uint32_t timeout_counter;
+
+extern uint8_t PD_setFlag;
+extern uint8_t master_cmd;
+extern uint8_t master_cycle;
+
+extern uint8_t *direct_param_ptr;
+
+// Extern for ISDU
+extern iol_isdu_t iol_iservice;
+
+extern uint8_t system_cmd;
+
+extern uint8_t dl_isdu_fsm;
+extern uint8_t ISDU_data_pointer;
+extern uint8_t ISDU_data_offset_index;
+extern uint8_t ISDU_data_count;
+extern uint8_t ISDU_in_buffer[70];
+extern uint8_t ISDU_out_buffer[70];
+extern uint8_t ISDU_RWflag;
+extern uint8_t ISDU_16bIndex;
+
+extern isdu_data_t *isdu_device_data_t;
+extern uint8_t *pdIn_ptr;
+
+
 void iol_dl_init(
 	uint8_t *dev_param_1_ptr,
 	isdu_data_t *isdu_data_ptr_t,
