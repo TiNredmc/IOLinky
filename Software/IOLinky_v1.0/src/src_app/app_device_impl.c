@@ -23,7 +23,10 @@ void app_initGPIO(){
 		(3 << (USART2_TX * 2)) 	|
 		(3 << (USART2_RX * 2)) 	| 
 		(3 << (OL_pin * 2)) 		|
-		(3 << (EN_pin	* 2))
+		(3 << (EN_pin	* 2))			|
+		(3 << (Isense_pin * 2))	|	
+		(3 << (V5sense_pin * 2))|	
+		(3 << (V24sense_pin * 2))
 		);
 
 	GPIO_CTL(GPIOA) |= 
@@ -70,6 +73,7 @@ void app_initIO(){
 	systick_init(F_CPU, 1000);			// Setup 1000 systick
 	app_initGPIO();
 	adc_initScanDMA((uint16_t*)&adc_measurement_t);
+	adc_softTrigger();// Initial ADC conversion
 }
 
 // Task to serve alive LED status.
@@ -113,6 +117,11 @@ void app_iol_updatePDTask(){
 	if((millis() - PD_refresh_millis) > 20){
 		PD_refresh_millis = millis();
 		
+		if(adc_getDataAvaible()){
+			iol_al_updatePD(adc_measurement_t.Isense_val);	
+				
+			adc_softTrigger();// Trigger next ADC conversion
+		}
 	}
 }
 
