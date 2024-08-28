@@ -55,7 +55,6 @@ void usart_initIOLink(
 	RCU_APB1EN |= (1 << 17);// Enable USART1 Clock
 		
 	USART_CTL0(USART1) |=
-		(1 << 15)			|	// x8 oversampling
 		(1 << 12)			|	// 9th bit for the parity
 		(1 << 10)			|	// Enable parity (Even parity)
 		(1 << 8)			|	// Enable Parity error interrupt
@@ -68,19 +67,19 @@ void usart_initIOLink(
 		
 	switch(com_mode){
 		case COM1:// 4.8 kBaud
-			USART_BAUD(USART1) |= 0x4E20;
+			USART_BAUD(USART1) |= 0x3AA0;
 			break;
 		
 		case COM2:// 38.4 kBaud
-			USART_BAUD(USART1) |= 0x09C0;
+			USART_BAUD(USART1) |= 0x0770;
 			break;
 				
 		case COM3:// 230.4 kBaud
-			USART_BAUD(USART1) |= 0x01A0;
+			USART_BAUD(USART1) |= 0x0140;
 			break;
 		
 		default:// Default at COM2
-			USART_BAUD(USART1) |= 0x09C0;
+			USART_BAUD(USART1) |= 0x0770;
 			break;
 	}
 	
