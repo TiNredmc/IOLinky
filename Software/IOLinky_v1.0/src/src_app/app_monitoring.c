@@ -36,7 +36,10 @@ void app_mon_checkVin(){
 }
 
 void app_mon_checkVout(){
-	if(psu_mondata_t.VOsense_val < THRESHOLD_VO_LO){
+	if(
+		(psu_mondata_t.VOsense_val < THRESHOLD_VO_LO) &&
+		psu_mondata_t.PSU_status_b.Buck_en
+	){
 		psu_mondata_t.PSU_status_b.VOut_ok = 0;
 		psu_mondata_t.PSU_status_b.VOut_UV = 1;
 		psu_mondata_t.PSU_status_b.VOut_OV = 0;
