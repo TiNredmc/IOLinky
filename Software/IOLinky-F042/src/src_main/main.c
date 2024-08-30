@@ -1,6 +1,23 @@
 // IO-Link device example with L6362 on STM32F042
 #include "main.h"
 
+typedef struct myFunctions{
+	void (*testA)(void);
+	void (*testB)(uint8_t input);
+}myFunctions;
+
+void testAFunct(){
+
+}
+
+void testBFunct(uint8_t input){
+
+}
+
+myFunctions testAPI = {
+	testAFunct,
+	testBFunct
+};
 
 void NMI_Handler(void){
 
@@ -15,6 +32,8 @@ void HardFault_Handler(void){
 int main(){
 	app_initIO();
 
+	testAPI.testA();
+	
 	while(1){
 		app_runner();
 	}

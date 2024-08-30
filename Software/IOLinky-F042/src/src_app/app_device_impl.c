@@ -118,14 +118,14 @@ void app_iol_updatePDTask(){
 // Tasks and FSMs that runs this IO-Link device
 void app_runner(){
 	switch(app_fsm){
-		case APP_INIT_STATE:
+		case APP_INIT_STATE:// App initialize state
 		{
 			iol_al_init();
 			app_fsm = APP_RUN_STATE;
 		}
 		break;
 		
-		case APP_RUN_STATE:// Check wake up current
+		case APP_RUN_STATE:// App running state
 		{
 			iol_al_poll();
 			app_iol_updatePDTask();

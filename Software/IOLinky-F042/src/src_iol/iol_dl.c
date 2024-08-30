@@ -11,6 +11,9 @@ iol_mtype_1_2_t iol_mt1_2;
 iol_mtype_2_2_t iol_mt2_2;
 #define MT2_2_LEN 6
 
+iol_mtype_2_V_8PDI_t iol_mt2_v;
+#define MT2_V_LEN 12
+
 iol_mtype_cks_t	iol_cks_t;
 
 iol_isdu_t iol_iservice;

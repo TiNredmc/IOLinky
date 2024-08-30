@@ -116,6 +116,42 @@ typedef struct __attribute__((packed)){
 	
 }iol_mtype_2_2_t;
 
+
+typedef struct __attribute__((packed)){
+	union{
+		uint8_t MC;
+		struct{
+			uint8_t ADDR	:5;// Address
+			uint8_t CC		:2;// Commu Channel
+			uint8_t RW		:1;// Read/Write
+		}MCBit;
+	};
+	
+	union{
+		uint8_t CKT;
+		struct{
+			uint8_t CKS		:6;// Checksum
+			uint8_t MT		:2;// M-sequence type
+		}CKTBit;
+	};
+	
+	uint8_t OD;// On-request Data
+	
+	// Process Data
+	uint8_t  PD[8];
+
+	union{
+		uint8_t CKS;
+		struct{
+			uint8_t CKS		:6;// Checksum
+			uint8_t PD		:1;// PD status
+			uint8_t EV		:1;// Event flag
+		}CKSBit;
+	};
+	
+}iol_mtype_2_V_8PDI_t;
+
+
 typedef union{
 	uint8_t CKS_B;
 	struct{

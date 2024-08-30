@@ -157,4 +157,15 @@ void iol_pl_setMtype2_2(){
 	current_mtype = MTYPE_2_2;
 }
 
+// Set the M-seq type to TYPE_2_V
+// with 8 bytes PD in
+void iol_pl_setMtype2_V_8PDI(){
+	l6362_setMseq(
+		2,
+		1,
+		1
+	);
+	current_mtype = MTYPE_2_V_8PDI;
+}
+
 // ========= END Set M-Seq Type ====================
