@@ -322,8 +322,8 @@
 			<ProcessDataRecordItemInfo subindex="16" />
 			
             <ProcessDataRecordItemInfo subindex="17" unitCode="1209" gradient="0.001611722" displayFormat="Dec.3"/>
-			<ProcessDataRecordItemInfo subindex="18" unitCode="1240" gradient="0.007252747" displayFormat="Dec.3"/>
-			<ProcessDataRecordItemInfo subindex="19" unitCode="1240" gradient="0.001611722" displayFormat="Dec.3"/>
+			<ProcessDataRecordItemInfo subindex="18" unitCode="1240" gradient="0.001611722" displayFormat="Dec.3"/>
+			<ProcessDataRecordItemInfo subindex="19" unitCode="1240" gradient="0.007252747" displayFormat="Dec.3"/>
           </ProcessDataRef>
 		  
         </ProcessDataRefCollection>
