@@ -7,6 +7,8 @@ uint32_t *adc_buffer_ptr;
 volatile uint32_t dma_stat = 0;
 volatile uint8_t adc_data_available = 0;
 
+uint32_t ADC_startup_delay = 0;
+
 void DMA_Channel0_IRQHandler(void){
 	dma_stat = DMA_INTF;
 	
@@ -28,6 +30,8 @@ void adc_initScanDMA(
 	if(adc_ptr == 0)
 			return;
 	
+	ADC_startup_delay = 0x1000000;
+	
 	adc_buffer_ptr = adc_ptr;
 		
 	RCU_AHBEN |= 1; // Enable DMA Clock
@@ -35,7 +39,7 @@ void adc_initScanDMA(
 	
 	ADC_CTL0 |= (1 << 8);// ADC Scan mode
 	
-	ADC_RSQ0 = (3 << 20);// Total scan of 3 channels
+	ADC_RSQ0 = ((3-1) << 20);// Total scan of 3 channels
 	
 	// Scan sequence
 	ADC_RSQ2 =
@@ -44,10 +48,10 @@ void adc_initScanDMA(
 		(V24sense_pin << 10)	;
 	
 	// Set sample cycle
-	ADC_SAMPT1 |=
-		(1 << (Isense_pin 	* 3))	|
-		(1 << (V5sense_pin 	* 3))	|
-		(1 << (V24sense_pin	* 3))	;
+	ADC_SAMPT1 =
+		(7 << (Isense_pin 	* 3))	|
+		(7 << (V5sense_pin 	* 3))	|
+		(7 << (V24sense_pin	* 3))	;
 	
 	ADC_CTL1 |=
 		(1 << 20)		| // Enable external trigger
@@ -55,7 +59,7 @@ void adc_initScanDMA(
 		(1 << 8)		; // Enable DMA request
 		
 	ADC_CTL1 |= 1;// Enable ADC
-	for(uint32_t i = 0; i < 1000000; i++){}
+	while(ADC_startup_delay--);
 	
 	ADC_CTL1 |= (1 << 3);// Reset calibration
 	while(ADC_CTL1 & (1 << 3));
