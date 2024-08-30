@@ -8,8 +8,8 @@ iol_mtype_0_t		iol_mt0;				// M-sequence TYPE_0 for start up
 //iol_mtype_1_2_t iol_mt1_2;			
 //#define MT1_2_LEN	5
 
-iol_mtype_2_2_t iol_mt2_2;			
-#define MT2_2_LEN 6
+//iol_mtype_2_2_t iol_mt2_2;			
+//#define MT2_2_LEN 6
 
 iol_mtype_2_V_8PDI_t iol_mt2_v;
 #define MT2_V_LEN 12
@@ -144,7 +144,7 @@ void iol_dl_poll(){
 					
 					case DL_MODE_OP:
 					{
-						iol_pl_update_WriteBuffer(&iol_mt2_2.OD);
+						iol_pl_update_WriteBuffer(&iol_mt2_v.OD);
 					}
 					break;
 				}
@@ -179,10 +179,10 @@ void iol_dl_modeSwitcher(){
 		
 		case 0x99:// Switch to Operate mode
 		{
-			iol_pl_setMtype2_2();
+			iol_pl_setMtype2_V_8PDI();
 			iol_pl_updateBuffer(
-				&iol_mt2_2.MC,
-				&iol_mt2_2.OD
+				&iol_mt2_v.MC,
+				&iol_mt2_v.OD
 			);
 			dl_mode_fsm = DL_MODE_OP;
 		}	
@@ -209,7 +209,7 @@ void iol_dl_modeSwitcher(){
 // of each operating mode.
 // STARTUP mode is default to use TYPE 0 message
 // in this example code PREOPERATE mode is also use TYPE 0 message
-// but in OPERATE mode, the M-sequence message type is TYPE 2_1
+// but in OPERATE mode, the M-sequence message type is TYPE 2_V (8 bytes PDin data)
 void iol_dl_modeHandler(){
 
 	switch(dl_mode_fsm){

@@ -147,6 +147,7 @@ void iol_dl_xorISDU(uint16_t Len){
 
 void iol_dl_craftISDURead(){
 	uint16_t isdu_idx = 0;
+	void *isdu_data_ptr;
 	
 	// Parse Index
 	if(ISDU_16bIndex == 1){
@@ -168,32 +169,7 @@ void iol_dl_craftISDURead(){
 		{
 			ISDU_data_count = strlen(isdu_device_data_t->vendor_name);
 			
-			if(ISDU_data_count < 16){
-				memcpy(
-					ISDU_out_buffer+1, 
-					isdu_device_data_t->vendor_name, 
-					ISDU_data_count);
-				
-				ISDU_data_count += 2;// I-service + checksum;
-				
-				ISDU_out_buffer[0] |= ISDU_data_count;// Length
-				
-				
-			}else{// Require Extlength if ISDU data is longer than 15 bytes
-				memcpy(
-					ISDU_out_buffer+2, 
-					isdu_device_data_t->vendor_name, 
-					ISDU_data_count);
-			
-				ISDU_data_count += 3;// I-service + ExtLength + checksum
-				
-				ISDU_out_buffer[0] |= 1;// Length
-				ISDU_out_buffer[1] = ISDU_data_count;
-				
-			}
-			
-			iol_dl_xorISDU(ISDU_data_count);
-			
+			isdu_data_ptr = isdu_device_data_t->vendor_name;			
 		}
 		break;
 		
@@ -201,32 +177,7 @@ void iol_dl_craftISDURead(){
 		{
 			ISDU_data_count = strlen(isdu_device_data_t->vendor_text);
 			
-			if(ISDU_data_count < 16){
-				memcpy(
-					ISDU_out_buffer+1, 
-					isdu_device_data_t->vendor_text, 
-					ISDU_data_count);
-				
-				ISDU_data_count += 2;// I-service + checksum;
-				
-				ISDU_out_buffer[0] |= ISDU_data_count;// Length
-				
-				
-			}else{// Require Extlength if ISDU data is longer than 15 bytes
-				memcpy(
-					ISDU_out_buffer+2, 
-					isdu_device_data_t->vendor_text, 
-					ISDU_data_count);
-			
-				ISDU_data_count += 3;// I-service + ExtLength + checksum
-				
-				ISDU_out_buffer[0] |= 1;// Length
-				ISDU_out_buffer[1] = ISDU_data_count;
-				
-			}
-			
-			iol_dl_xorISDU(ISDU_data_count);
-			
+			isdu_data_ptr = isdu_device_data_t->vendor_text;			
 		}
 		break;
 		
@@ -234,31 +185,7 @@ void iol_dl_craftISDURead(){
 		{
 			ISDU_data_count = strlen(isdu_device_data_t->product_name);
 			
-			if(ISDU_data_count < 16){
-				memcpy(
-					ISDU_out_buffer+1, 
-					isdu_device_data_t->product_name, 
-					ISDU_data_count);
-				
-				ISDU_data_count += 2;// I-service + checksum;
-				
-				ISDU_out_buffer[0] |= ISDU_data_count;// Length
-				
-				
-			}else{// Require Extlength if ISDU data is longer than 15 bytes
-				memcpy(
-					ISDU_out_buffer+2, 
-					isdu_device_data_t->product_name, 
-					ISDU_data_count);
-			
-				ISDU_data_count += 3;// I-service + ExtLength + checksum
-				
-				ISDU_out_buffer[0] |= 1;// Length
-				ISDU_out_buffer[1] = ISDU_data_count;
-				
-			}
-			
-			iol_dl_xorISDU(ISDU_data_count);
+			isdu_data_ptr = isdu_device_data_t->product_name;
 		}
 		break;
 		
@@ -266,65 +193,15 @@ void iol_dl_craftISDURead(){
 		{
 			ISDU_data_count = strlen(isdu_device_data_t->product_id);
 			
-			if(ISDU_data_count < 16){
-				memcpy(
-					ISDU_out_buffer+1, 
-					isdu_device_data_t->product_id, 
-					ISDU_data_count);
-				
-				ISDU_data_count += 2;// I-service + checksum;
-				
-				ISDU_out_buffer[0] |= ISDU_data_count;// Length
-				
-				
-			}else{// Require Extlength if ISDU data is longer than 15 bytes
-				memcpy(
-					ISDU_out_buffer+2, 
-					isdu_device_data_t->product_id, 
-					ISDU_data_count);
-			
-				ISDU_data_count += 3;// I-service + ExtLength + checksum
-				
-				ISDU_out_buffer[0] |= 1;// Length
-				ISDU_out_buffer[1] = ISDU_data_count;
-				
-			}
-			
-			iol_dl_xorISDU(ISDU_data_count);
-			
+			isdu_data_ptr = isdu_device_data_t->product_id;
 		}
 		break;
 		
 		case 0x0014:// Product Text (64 Bytes)
 		{
-			ISDU_data_count = strlen(isdu_device_data_t->product_test);
+			ISDU_data_count = strlen(isdu_device_data_t->product_text);
 			
-			if(ISDU_data_count < 16){
-				memcpy(
-					ISDU_out_buffer+1, 
-					isdu_device_data_t->product_test, 
-					ISDU_data_count);
-				
-				ISDU_data_count += 2;// I-service + checksum;
-				
-				ISDU_out_buffer[0] |= ISDU_data_count;// Length
-				
-				
-			}else{// Require Extlength if ISDU data is longer than 15 bytes
-				memcpy(
-					ISDU_out_buffer+2, 
-					isdu_device_data_t->product_test, 
-					ISDU_data_count);
-			
-				ISDU_data_count += 3;// I-service + ExtLength + checksum
-				
-				ISDU_out_buffer[0] |= 1;// Length
-				ISDU_out_buffer[1] = ISDU_data_count;
-				
-			}
-			
-			iol_dl_xorISDU(ISDU_data_count);
-			
+			isdu_data_ptr = isdu_device_data_t->product_text;			
 		}
 		break;
 		
@@ -332,31 +209,7 @@ void iol_dl_craftISDURead(){
 		{
 			ISDU_data_count = strlen(isdu_device_data_t->serial_number);
 			
-			if(ISDU_data_count < 16){
-				memcpy(
-					ISDU_out_buffer+1, 
-					isdu_device_data_t->serial_number, 
-					ISDU_data_count);
-				
-				ISDU_data_count += 2;// I-service + checksum;
-				
-				ISDU_out_buffer[0] |= ISDU_data_count;// Length
-				
-				
-			}else{// Require Extlength if ISDU data is longer than 15 bytes
-				memcpy(
-					ISDU_out_buffer+2, 
-					isdu_device_data_t->serial_number, 
-					ISDU_data_count);
-			
-				ISDU_data_count += 3;// I-service + ExtLength + checksum
-				
-				ISDU_out_buffer[0] |= 1;// Length
-				ISDU_out_buffer[1] = ISDU_data_count;
-				
-			}
-			
-			iol_dl_xorISDU(ISDU_data_count);
+			isdu_data_ptr = isdu_device_data_t->serial_number;
 		}
 		break;
 		
@@ -364,31 +217,7 @@ void iol_dl_craftISDURead(){
 		{
 			ISDU_data_count = strlen(isdu_device_data_t->hardware_revision);
 			
-			if(ISDU_data_count < 16){
-				memcpy(
-					ISDU_out_buffer+1, 
-					isdu_device_data_t->hardware_revision, 
-					ISDU_data_count);
-				
-				ISDU_data_count += 2;// I-service + checksum;
-				
-				ISDU_out_buffer[0] |= ISDU_data_count;// Length
-				
-				
-			}else{// Require Extlength if ISDU data is longer than 15 bytes
-				memcpy(
-					ISDU_out_buffer+2, 
-					isdu_device_data_t->hardware_revision, 
-					ISDU_data_count);
-			
-				ISDU_data_count += 3;// I-service + ExtLength + checksum
-				
-				ISDU_out_buffer[0] |= 1;// Length
-				ISDU_out_buffer[1] = ISDU_data_count;
-				
-			}
-			
-			iol_dl_xorISDU(ISDU_data_count);
+			isdu_data_ptr = isdu_device_data_t->hardware_revision;
 		}
 		break;
 		
@@ -396,47 +225,57 @@ void iol_dl_craftISDURead(){
 		{
 			ISDU_data_count = strlen(isdu_device_data_t->firmware_revision);
 			
-			if(ISDU_data_count < 16){
-				memcpy(
-					ISDU_out_buffer+1, 
-					isdu_device_data_t->firmware_revision, 
-					ISDU_data_count);
-				
-				ISDU_data_count += 2;// I-service + checksum;
-				
-				ISDU_out_buffer[0] |= ISDU_data_count;// Length
-				
-				
-			}else{// Require Extlength if ISDU data is longer than 15 bytes
-				memcpy(
-					ISDU_out_buffer+2, 
-					isdu_device_data_t->firmware_revision, 
-					ISDU_data_count);
-			
-				ISDU_data_count += 3;// I-service + ExtLength + checksum
-				
-				ISDU_out_buffer[0] |= 1;// Length
-				ISDU_out_buffer[1] = ISDU_data_count;
-				
-			}
-			
-			iol_dl_xorISDU(ISDU_data_count);
+			isdu_data_ptr = isdu_device_data_t->firmware_revision;
 		}
 		break;
 		
 		case 0x0028:// Process Data input
 		{
-			ISDU_data_count = 1 + 2 + 1;// I-service + text + checksum
+			ISDU_data_count = 1 + 8 + 1;// I-service + PD + checksum
 			ISDU_out_buffer[0] |= ISDU_data_count;// Length
-			ISDU_out_buffer[1] = *(pdIn_ptr+1);
 			ISDU_out_buffer[2] = *pdIn_ptr;
-			iol_dl_xorISDU(ISDU_data_count);
+			ISDU_out_buffer[1] = *(pdIn_ptr+1);
+			ISDU_out_buffer[4] = *(pdIn_ptr+2);
+			ISDU_out_buffer[3] = *(pdIn_ptr+3);
+			ISDU_out_buffer[6] = *(pdIn_ptr+4);
+			ISDU_out_buffer[5] = *(pdIn_ptr+5);
+			ISDU_out_buffer[8] = *(pdIn_ptr+6);
+			ISDU_out_buffer[7] = *(pdIn_ptr+7);
+			
+			goto isdu_exit;
 		}
 		break;
 		
 		default:
-			break;
+			return;		
 	}
+	
+	if(ISDU_data_count < 16){
+		memcpy(
+			ISDU_out_buffer+1, 
+			isdu_data_ptr, 
+			ISDU_data_count);
+
+		ISDU_data_count += 2;// I-service + checksum;
+
+		ISDU_out_buffer[0] |= ISDU_data_count;// Length
+
+
+	}else{// Require Extlength if ISDU data is longer than 15 bytes
+		memcpy(
+			ISDU_out_buffer+2, 
+			isdu_data_ptr, 
+			ISDU_data_count);
+
+		ISDU_data_count += 3;// I-service + ExtLength + checksum
+
+		ISDU_out_buffer[0] |= 1;// Length
+		ISDU_out_buffer[1] = ISDU_data_count;
+
+	}
+	
+isdu_exit:
+	iol_dl_xorISDU(ISDU_data_count);
 	
 }
 

@@ -136,8 +136,16 @@ typedef struct __attribute__((packed)){
 	uint8_t OD;// On-request Data
 	
 	// Process Data
-	uint8_t  PD[8];
-
+	union{
+		uint8_t  PD[8];
+		struct{
+			uint16_t psu_stat;
+			uint16_t iout;
+			uint16_t vout;
+			uint16_t vin;
+		}PDWord;
+	};
+	
 	union{
 		uint8_t CKS;
 		struct{
@@ -184,7 +192,7 @@ typedef struct __attribute__((packed)){
 	char *vendor_text;
 	char *product_name;
 	char *product_id;
-	char *product_test;
+	char *product_text;
 	char *serial_number;
 	char *hardware_revision;
 	char *firmware_revision;
@@ -192,7 +200,6 @@ typedef struct __attribute__((packed)){
 
 // Extern for msg handler
 extern iol_mtype_0_t iol_mt0;
-extern iol_mtype_2_2_t iol_mt2_2;
 extern iol_mtype_2_V_8PDI_t iol_mt2_v;
 extern iol_mtype_cks_t iol_cks_t;
 

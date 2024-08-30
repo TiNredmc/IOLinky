@@ -6,15 +6,16 @@
 
 enum PREOP_MSEQ_CODE{
 	PREOP_M_0 = 0,
-	PREOP_M_1_2 = 16,
-	PREOP_M_1_V8 = 32,
-	PREOP_M_1_V32 = 48
+	PREOP_M_1_2 = (1 << 4),
+	PREOP_M_1_V8 = (2 << 4),
+	PREOP_M_1_V32 = (3 << 4)
 };
 
 enum OP_MSEQ_CODE{
 	OP_M_0 = 0,
-	OP_M_1_2 = 2,
-	OP_M_2_2 = 0
+	OP_M_1_2 = (1 << 1),
+	OP_M_2_2 = 0,
+	OP_M_2_V8 = (4 << 1)
 };
 
 typedef struct __attribute__((packed)){
@@ -100,8 +101,10 @@ typedef struct __attribute__((packed)){
 	direct_param_p2_t dp_p2_t;
 }device_directparam_t;
 
-void iol_al_init();
+void iol_al_init(
+	uint8_t *PD_data_ptr
+	);
 void iol_al_poll();
-void iol_al_updatePD(uint16_t pd_val);
+void iol_al_updatePD();
 
 #endif
