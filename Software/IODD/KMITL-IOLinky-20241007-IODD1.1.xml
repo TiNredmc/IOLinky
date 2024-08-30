@@ -58,18 +58,225 @@
         <StdVariableRef id="V_HardwareRevision" defaultValue="EVLIOL" />
         <StdVariableRef id="V_FirmwareRevision" defaultValue="EVL" />
         <StdVariableRef id="V_ProcessDataInput" />
-        <StdVariableRef id="V_ProcessDataOutput" />
 		
       </VariableCollection>
 	  
       <ProcessDataCollection>
         <ProcessData id="PD_ProcessDataDigitalInput">
 		
-          <ProcessDataIn id="PD_UINT16T" bitLength="16">
-            <Datatype xsi:type="UIntegerT" bitLength="16">
-				<!-- <SingleValue defaultValue="0"> -->
-					<!-- <Name textId="IOL_Data_0"/> -->
-				<!-- </SingleValue> -->
+          <ProcessDataIn id="PD_IOLINKY" bitLength="64">
+             <Datatype xsi:type="RecordT" bitLength="64" subindexAccessSupported="false">
+			 
+				<!-- Input voltage status -->
+				<RecordItem subindex="1" bitOffset="0">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Vin_OK" />
+              </RecordItem>
+			  
+				<!-- Input voltage UV -->
+				<RecordItem subindex="2" bitOffset="1">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Vin_UV" />
+              </RecordItem>
+			  
+			  <!-- Input voltage OV -->
+			  <RecordItem subindex="3" bitOffset="2">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Vin_OV" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="4" bitOffset="3">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Vout_OK" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="5" bitOffset="4">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Vout_UV" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="6" bitOffset="5">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Vout_OV" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="7" bitOffset="6">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Iout_OK" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="8" bitOffset="7">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Iout_OC" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="9" bitOffset="8">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Iout_SC" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="10" bitOffset="9">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Efuse_ACT" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="11" bitOffset="10">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Efuse_TRIP" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="12" bitOffset="11">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_Buck_EN" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="13" bitOffset="12">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_NA" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="14" bitOffset="13">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_NA" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="15" bitOffset="14">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_NA" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="16" bitOffset="15">
+                <SimpleDatatype xsi:type="BooleanT">
+                  <SingleValue value="true">
+                    <Name textId="IOL_YES" />
+                  </SingleValue>
+                  <SingleValue value="false">
+                    <Name textId="IOL_NO" />
+                  </SingleValue>
+                </SimpleDatatype>
+                <Name textId="IOL_NA" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="17" bitOffset="16">
+                <SimpleDatatype xsi:type="UIntegerT" bitLength="16" />
+                <Name textId="IOL_Iout_mon" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="18" bitOffset="32">
+                <SimpleDatatype xsi:type="UIntegerT" bitLength="16" />
+                <Name textId="IOL_Vout_mon" />
+              </RecordItem>
+			  
+			  <RecordItem subindex="19" bitOffset="48">
+                <SimpleDatatype xsi:type="UIntegerT" bitLength="16" />
+                <Name textId="IOL_Vin_mon" />
+              </RecordItem>
+			  
 			</Datatype>
 			
             <Name textId="IOL_Data_0" />
@@ -96,8 +303,27 @@
 	  
         <ProcessDataRefCollection>
 		
-          <ProcessDataRef processDataId="PD_UINT16T">
-            <ProcessDataInfo unitCode="1243" gradient="0.8057" displayFormat="Dec.1"/>
+          <ProcessDataRef processDataId="PD_IOLINKY">
+			<ProcessDataRecordItemInfo subindex="1" />
+			<ProcessDataRecordItemInfo subindex="2" />
+			<ProcessDataRecordItemInfo subindex="3" />
+			<ProcessDataRecordItemInfo subindex="4" />
+			<ProcessDataRecordItemInfo subindex="5" />
+			<ProcessDataRecordItemInfo subindex="6" />
+			<ProcessDataRecordItemInfo subindex="7" />
+			<ProcessDataRecordItemInfo subindex="8" />
+			<ProcessDataRecordItemInfo subindex="9" />
+			<ProcessDataRecordItemInfo subindex="10" />
+			<ProcessDataRecordItemInfo subindex="11" />
+			<ProcessDataRecordItemInfo subindex="12" />
+			<ProcessDataRecordItemInfo subindex="13" />
+			<ProcessDataRecordItemInfo subindex="14" />
+			<ProcessDataRecordItemInfo subindex="15" />
+			<ProcessDataRecordItemInfo subindex="16" />
+			
+            <ProcessDataRecordItemInfo subindex="17" unitCode="1209" gradient="0.001611722" displayFormat="Dec.3"/>
+			<ProcessDataRecordItemInfo subindex="18" unitCode="1240" gradient="0.007252747" displayFormat="Dec.3"/>
+			<ProcessDataRecordItemInfo subindex="19" unitCode="1240" gradient="0.001611722" displayFormat="Dec.3"/>
           </ProcessDataRef>
 		  
         </ProcessDataRefCollection>
@@ -174,7 +400,7 @@
   <CommNetworkProfile xsi:type="IOLinkCommNetworkProfileT" iolinkRevision="V1.1">
     <TransportLayers>
 	
-      <PhysicalLayer bitrate="COM2" minCycleTime="4000" sioSupported="false" mSequenceCapability="1">
+      <PhysicalLayer bitrate="COM3" minCycleTime="86400" sioSupported="false" mSequenceCapability="1">
         <Connection xsi:type="M12-4ConnectionT">
           <ProductRef productId="10Linky" />
           <Wire1 />
@@ -201,12 +427,38 @@
   <ExternalTextCollection>
 
     <PrimaryLanguage xml:lang="en">
+	  <Text id="IOL_YES" value="yes" />
+	  <Text id="IOL_NO" value="no" />
+	  <Text id="IOL_NA" value="not available" />
+	  
       <Text id="IOL_VendorText" value="The Master of Innovation" />
       <Text id="IOL_Device_Name" value="IO-Linky" />
       <Text id="IOL_DeviceFamily" value="IO-Link" />
 	  <Text id="IOL_DeviceDescription" value="Open source IO-Link-compatible software stack demo" />
       <Text id="IOL_VendorUrl" value="https://www.kmitl.ac.th/" />
-	  <Text id="IOL_Data_0" value="Process Data 0" />
+	  
+	  <Text id="IOL_Data_0" value="PSU status" />
+	  
+	  <Text id="IOL_Vin_OK" value="Input voltage good" />
+	  <Text id="IOL_Vin_UV" value="Input undervoltage" />
+	  <Text id="IOL_Vin_OV" value="Input overvoltage" />
+	  
+	  <Text id="IOL_Vout_OK" value="Output voltage good" />
+	  <Text id="IOL_Vout_UV" value="Output undervoltage" />
+	  <Text id="IOL_Vout_OV" value="Output overvoltage" />
+	  
+	  <Text id="IOL_Iout_OK" value="Output current good" />
+	  <Text id="IOL_Iout_OC" value="Output overcurrent" />
+	  <Text id="IOL_Iout_SC" value="Output short circuit" />
+	  
+	  <Text id="IOL_Efuse_ACT" value="EFuse activated" />
+	  <Text id="IOL_Efuse_TRIP" value="EFuse tripped" />
+	  
+	  <Text id="IOL_Buck_EN" value="Buck converter on" />
+	  
+	  <Text id="IOL_Iout_mon" value="Output current" />
+	  <Text id="IOL_Vin_mon" value="Input voltage" />
+	  <Text id="IOL_Vout_mon" value="Output voltage" />
 	  
 	  <Text id="IOL_M_Process_Data" value="Process Data menu" />
 	  <Text id="IOL_M_DirectParam" value="Direct Parameter menu" />
