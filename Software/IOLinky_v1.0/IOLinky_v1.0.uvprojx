@@ -439,6 +439,16 @@
               <FileType>5</FileType>
               <FilePath>.\src\src_drv\usart.h</FilePath>
             </File>
+            <File>
+              <FileName>tim0_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\src_drv\tim0_led.c</FilePath>
+            </File>
+            <File>
+              <FileName>tim0_led.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\src_drv\tim0_led.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -459,6 +469,21 @@
               <FileType>5</FileType>
               <FilePath>.\src\src_app\gpio_pinout.h</FilePath>
             </File>
+            <File>
+              <FileName>app_psu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\src_app\app_psu.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_psu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\src_app\app_psu.h</FilePath>
+            </File>
+            <File>
+              <FileName>app_monitoring.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\src_app\app_monitoring.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -478,6 +503,26 @@
               <FileName>iol_dl.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\src_iol\iol_dl.c</FilePath>
+            </File>
+            <File>
+              <FileName>iol_dl_isdu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\src_iol\iol_dl_isdu.c</FilePath>
+            </File>
+            <File>
+              <FileName>iol_dl_startup_msg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\src_iol\iol_dl_startup_msg.c</FilePath>
+            </File>
+            <File>
+              <FileName>iol_dl_preoperate_msg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\src_iol\iol_dl_preoperate_msg.c</FilePath>
+            </File>
+            <File>
+              <FileName>iol_dl_operate_msg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\src_iol\iol_dl_operate_msg.c</FilePath>
             </File>
             <File>
               <FileName>iol_dl.h</FileName>
