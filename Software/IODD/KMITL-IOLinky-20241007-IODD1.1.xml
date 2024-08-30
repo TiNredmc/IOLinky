@@ -400,7 +400,7 @@
   <CommNetworkProfile xsi:type="IOLinkCommNetworkProfileT" iolinkRevision="V1.1">
     <TransportLayers>
 	
-      <PhysicalLayer bitrate="COM3" minCycleTime="86400" sioSupported="false" mSequenceCapability="1">
+      <PhysicalLayer bitrate="COM3" minCycleTime="20000" sioSupported="false" mSequenceCapability="1">
         <Connection xsi:type="M12-4ConnectionT">
           <ProductRef productId="10Linky" />
           <Wire1 />
