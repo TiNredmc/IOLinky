@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "iol_l6362.h"
 
+#include "tim0_led.h"
+
 enum current_mtype_e{
 	MTYPE_0 = 0,
 	MTYPE_1_2,

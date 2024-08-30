@@ -11,7 +11,7 @@ uint8_t write_request = 0;
 uint8_t read_available = 0;
 
 uint8_t alive_led = 0;
-
+uint8_t alive_switch_updn = 0;
 // Private pointers
 
 uint8_t *read_buffer_ptr;
@@ -26,7 +26,7 @@ void iol_pl_init(
 	read_buffer_ptr = rd_buffer_ptr;	
 	write_buffer_ptr = wr_buffer_ptr;
 		
-	l6362_init(COM2);
+	l6362_init(COM3);
 		
 	// Startup with Type-0 to detect wakeup sequence
 	iol_pl_setMtype0();
@@ -52,7 +52,7 @@ void iol_pl_updateBuffer(
 }
 
 // Run the standby LED
-void iol_pl_standbyLED(){// Red LED
+void iol_pl_standbyLED(){// Red LED	
 	if(alive_led > 0x08){
 		alive_led--;
 		if(alive_led == 0x10)
@@ -63,7 +63,7 @@ void iol_pl_standbyLED(){// Red LED
 			alive_led = 0x18;
 	}
 	
-	//l6364_setLED2(alive_led & 0x0F);
+	timerled_setRedLED(alive_led << 4);
 }
 
 // Run the connected LED
@@ -78,7 +78,7 @@ void iol_pl_connectedLED(){// Green LED
 			alive_led = 0x18;
 	}
 	
-	//l6364_setLED1(alive_led & 0x0F);
+	timerled_setGreenLED(alive_led << 4);
 }
 
 // Poll reading from the L6364
