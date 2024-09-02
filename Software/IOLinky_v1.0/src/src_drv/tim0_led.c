@@ -18,6 +18,7 @@ void timerled_init(){
 		(1 << 8)		|				// Enable CH2
 		(1 << 4)		;				// Enable CH1
 		
+	TIMER_CCHP(TIMER0) |= (1 << 14);// Enable Primary output
 	
 	TIMER_CTL0(TIMER0) |= 1;// Enable Timer
 }
