@@ -8,7 +8,7 @@
 #include "gpio_pinout.h"
 
 void adc_initScanDMA(
-	uint32_t* adc_ptr
+	uint16_t* adc_ptr
 	);
 void adc_softTrigger();
 uint8_t adc_getDataAvaible();

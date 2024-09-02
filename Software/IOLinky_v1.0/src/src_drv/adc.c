@@ -1,7 +1,7 @@
 #include "adc.h"
 
 // Private pointers
-uint32_t *adc_buffer_ptr;
+uint16_t *adc_buffer_ptr;
 
 // Private variables
 volatile uint32_t dma_stat = 0;
@@ -24,7 +24,7 @@ void DMA_Channel0_IRQHandler(void){
 }
 
 void adc_initScanDMA(
-	uint32_t* adc_ptr
+	uint16_t* adc_ptr
 	){
 		
 	if(adc_ptr == 0)
