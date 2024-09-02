@@ -50,13 +50,13 @@
           <StdSingleValueRef value="130" />
         </StdVariableRef>
         <StdVariableRef id="V_VendorName" defaultValue="KMITL" />
-        <StdVariableRef id="V_VendorText" defaultValue="The Master of Innovation" />
-        <StdVariableRef id="V_ProductName" defaultValue="IO-Linky" />
+        <StdVariableRef id="V_VendorText" defaultValue="Global Engineering" />
+        <StdVariableRef id="V_ProductName" defaultValue="IOLinky V1.0" />
         <StdVariableRef id="V_ProductID" defaultValue="10Linky"/>
-        <StdVariableRef id="V_ProductText" defaultValue="TinLethax" />
+        <StdVariableRef id="V_ProductText" defaultValue="Digital Buck converter" />
         <StdVariableRef id="V_SerialNumber" defaultValue="1234ABCD" />
-        <StdVariableRef id="V_HardwareRevision" defaultValue="EVLIOL" />
-        <StdVariableRef id="V_FirmwareRevision" defaultValue="EVL" />
+        <StdVariableRef id="V_HardwareRevision" defaultValue="E230_6362" />
+        <StdVariableRef id="V_FirmwareRevision" defaultValue="E230_V1" />
         <StdVariableRef id="V_ProcessDataInput" />
 		
       </VariableCollection>
@@ -431,7 +431,7 @@
 	  <Text id="IOL_NO" value="no" />
 	  <Text id="IOL_NA" value="not available" />
 	  
-      <Text id="IOL_VendorText" value="The Master of Innovation" />
+      <Text id="IOL_VendorText" value="KMITL" />
       <Text id="IOL_Device_Name" value="IO-Linky" />
       <Text id="IOL_DeviceFamily" value="IO-Link" />
 	  <Text id="IOL_DeviceDescription" value="Open source IO-Link-compatible software stack demo" />

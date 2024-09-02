@@ -34,14 +34,14 @@ device_directparam_t device_dp_t = {
 };
 
 isdu_data_t isdu_d_t = {
-	"KMITL",
-	"The Master of Innivation",
-	"IOLinkyF042",
-	"10Linky",
-	"TinLethax",
-	"1234ABCD",
-	"F042_6362",
-	"F042"
+	"KMITL",										// Vendor Name
+	"Global Engineering", 			// Vendor Text
+	"IOLinky V1.0",							// Product name
+	"10Linky",									// Product ID
+	"Digital Buck converter",		// Product text
+	"1234ABCD",									// Serial number
+	"E230_6362",								// Hardware version
+	"E230_V1"										// Firmware version
 };
 
 // Initialize the underlying layer (AL->DL->PL)
