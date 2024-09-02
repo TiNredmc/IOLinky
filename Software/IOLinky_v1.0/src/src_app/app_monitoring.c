@@ -36,20 +36,24 @@ void app_mon_checkVin(){
 }
 
 void app_mon_checkVout(){
-	if(
-		(psu_mondata_t.VOsense_val < THRESHOLD_VO_LO) &&
-		psu_mondata_t.PSU_status_b.Buck_en
-	){
-		psu_mondata_t.PSU_status_b.VOut_ok = 0;
-		psu_mondata_t.PSU_status_b.VOut_UV = 1;
-		psu_mondata_t.PSU_status_b.VOut_OV = 0;
-	}else if(psu_mondata_t.VOsense_val > THRESHOLD_VO_HI){
-		psu_mondata_t.PSU_status_b.VOut_ok = 0;
-		psu_mondata_t.PSU_status_b.VOut_UV = 0;
-		psu_mondata_t.PSU_status_b.VOut_OV = 1;
+	if(psu_mondata_t.PSU_status_b.Buck_en){
+		if(psu_mondata_t.VOsense_val < THRESHOLD_VO_LO){
+			psu_mondata_t.PSU_status_b.VOut_ok = 0;
+			psu_mondata_t.PSU_status_b.VOut_UV = 1;
+		}else{
+			psu_mondata_t.PSU_status_b.VOut_ok = 1;
+			psu_mondata_t.PSU_status_b.VOut_UV = 0;
+		}
 	}else{
 		psu_mondata_t.PSU_status_b.VOut_ok = 0;
 		psu_mondata_t.PSU_status_b.VOut_UV = 0;
+	}
+	
+	if(psu_mondata_t.VOsense_val > THRESHOLD_VO_HI){
+		psu_mondata_t.PSU_status_b.VOut_ok = 0;
+		psu_mondata_t.PSU_status_b.VOut_OV = 1;
+	}else{
+		psu_mondata_t.PSU_status_b.VOut_ok = 1;
 		psu_mondata_t.PSU_status_b.VOut_OV = 0;
 	}
 }
@@ -60,7 +64,7 @@ void app_mon_checkIout(){
 		if(psu_mondata_t.IOsense_val > THRESHOLD_IO_NOM){
 			// More than Nominal current
 			if(psu_mondata_t.IOsense_val > THRESHOLD_IO_HI){
-				// More than High current -> Trip
+				// More than High current -> Trip Efuse
 				psu_mondata_t.PSU_status_b.IOut_ok = 1;
 				psu_mondata_t.PSU_status_b.IOut_OC = 1;
 				psu_mondata_t.PSU_status_b.IOut_SC = 0;
@@ -94,7 +98,7 @@ void app_mon_checkIout(){
 			psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
 		}
 	}else{
-		if(psu_mondata_t.IOsense_val > THRESHOLD_IO_HI){
+		if(psu_mondata_t.IOsense_val > THRESHOLD_IO_SC){
 			// Short circuit detection
 			psu_mondata_t.PSU_status_b.IOut_ok = 0;
 			psu_mondata_t.PSU_status_b.IOut_OC = 1;
