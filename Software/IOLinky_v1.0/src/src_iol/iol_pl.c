@@ -63,7 +63,8 @@ void iol_pl_standbyLED(){// Red LED
 			alive_led = 0x18;
 	}
 	
-	timerled_setRedLED(alive_led << 4);
+	timerled_setRedLED(alive_led & 0x0F);
+	timerled_setGreenLED(0);
 }
 
 // Run the connected LED
@@ -78,7 +79,8 @@ void iol_pl_connectedLED(){// Green LED
 			alive_led = 0x18;
 	}
 	
-	timerled_setGreenLED(alive_led << 4);
+	timerled_setRedLED(0);
+	timerled_setGreenLED(alive_led & 0x0F);
 }
 
 // Poll reading from the L6364

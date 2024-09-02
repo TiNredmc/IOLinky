@@ -4,7 +4,7 @@ void timerled_init(){
 	RCU_APB2EN |= (1 << 11);// Enable TIMER0 clock
 	
 	TIMER_PSC(TIMER0) = 2812;// 72Mhz/(256*1000) -> 2812
-	TIMER_CAR(TIMER0) = 0x00FF;// 8bit pwm
+	TIMER_CAR(TIMER0) = 0x000F;// 4bit pwm
 	
 	TIMER_CHCTL0(TIMER0) = 
 		(7 << 12)					|
