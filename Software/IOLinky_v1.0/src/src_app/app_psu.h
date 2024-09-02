@@ -27,9 +27,9 @@
 // (I/2) * (4095 / 3.3)
 // PSU Current threshold
 #define THRESHOLD_IO_NOM	1861 // around 3A
-#define THRESHOLD_IO_PEAK	2482 // around 3.8A
+#define THRESHOLD_IO_PEAK	2357 // around 3.8A
 #define THRESHOLD_IO_HI		2481 // around 4A
-
+#define THRESHOLD_IO_SC		2481 // short circuit at 4A
 // Efuse calculation
 // (Ipeak^2 - Inom^2) * t
 // Inom is 3A
