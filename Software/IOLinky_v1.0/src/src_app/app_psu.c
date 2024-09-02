@@ -22,7 +22,7 @@ void app_mon_efuseReset();
 void app_psu_init(){
 	// Setup ADC
 	adc_initScanDMA(
-		(uint32_t*)(&psu_mondata_t.IOsense_val)
+		(uint16_t*)(&psu_mondata_t.IOsense_val)
 	);
 	adc_softTrigger();// Initial ADC conversion
 }
@@ -71,7 +71,6 @@ void app_psu_runner(){
 		case PSU_STATE_INIT:// PSU initialize state
 		{
 			// Init all Status bit
-			psu_mondata_t.PSU_status_w = 0x0000;
 			app_mon_efuseReset();
 			PSU_fsm = PSU_STATE_IDLE;
 		}
@@ -88,11 +87,11 @@ void app_psu_runner(){
 				!psu_mondata_t.PSU_status_b.Efuse_Act	&& // Efuse is not counting
 				!psu_mondata_t.PSU_status_b.Efuse_Trip   // No Efuse tripped
 				
-				)	// Check for bad stuffs	
-			&
+				)	// Check for not having bad stuffs	
+			&&
 				(
 					psu_mondata_t.PSU_status_b.VIn_ok
-				)	// Check for good stuffs
+				)	// Check for having good stuffs
 			){
 				// If good to go, enable buck converter.
 				app_psu_enableBuck();
@@ -113,6 +112,7 @@ void app_psu_runner(){
 			psu_mondata_t.PSU_status_b.IOut_SC		 // Short circuit detected
 			){
 				PSU_fsm = PSU_STATE_SC;
+				break;
 			}
 			
 			// Check if Vin is not OK
@@ -121,6 +121,7 @@ void app_psu_runner(){
 			){
 				app_psu_disableBuck();
 				PSU_fsm = PSU_STATE_VIN_NOK;
+				break;
 			}
 			
 			// Check if Vout is Overvolt
@@ -129,6 +130,7 @@ void app_psu_runner(){
 			psu_mondata_t.PSU_status_b.VOut_OV
 			){
 				PSU_fsm = PSU_STATE_VOUT_NOK;
+				break;
 			}
 			
 			// Check overcurrent and Efuse
@@ -138,6 +140,7 @@ void app_psu_runner(){
 			psu_mondata_t.PSU_status_b.Efuse_Act
 			){
 				PSU_fsm = PSU_STATE_OLP;
+				break;
 			}
 			
 			// If powered off (by IO-Link command)
@@ -275,7 +278,12 @@ void app_psu_runner(){
 			if(psu_mondata_t.PSU_status_b.Buck_en){
 				PSU_fsm = PSU_STATE_INIT;
 			}else{
-				PSU_fsm = PSU_STATE_INIT;
+				// TODO : Always check Vin even though
+				// the PSU is off
+				
+				
+				
+				PSU_fsm = PSU_STATE_PWROFF;
 			}
 		}
 		break;
