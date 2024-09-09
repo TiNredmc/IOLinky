@@ -98,7 +98,7 @@ void SystemInit (void)
     RCU_INT = 0x00000000U;
 
     /* configure system clock */
-    system_clock_config();
+    //system_clock_config();
     
 #ifdef VECT_TAB_SRAM
     nvic_vector_table_set(NVIC_VECTTAB_RAM,VECT_TAB_OFFSET);
