@@ -27,6 +27,7 @@ void iol_pl_updateBuffer(
 
 void iol_pl_standbyLED();
 void iol_pl_connectedLED();
+void iol_pl_faultLED();
 void iol_pl_pollRead();
 void iol_pl_pollWrite();
 

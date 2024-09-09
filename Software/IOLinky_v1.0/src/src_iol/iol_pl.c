@@ -83,6 +83,22 @@ void iol_pl_connectedLED(){// Green LED
 	timerled_setGreenLED(alive_led & 0x0F);
 }
 
+// Run both LED to get Yellow warning error.
+void iol_pl_faultLED(){
+	if(alive_led > 0x08){
+		alive_led--;
+		if(alive_led == 0x10)
+			alive_led = 0;
+	}else{
+		alive_led++;
+		if(alive_led == 0x08)
+			alive_led = 0x18;
+	}
+	
+	timerled_setRedLED(alive_led & 0x0F);
+	timerled_setGreenLED(alive_led & 0x0F);
+}
+
 // Poll reading from the L6364
 void iol_pl_pollRead(){
 		read_available = l6362_readFIFO(read_buffer_ptr);

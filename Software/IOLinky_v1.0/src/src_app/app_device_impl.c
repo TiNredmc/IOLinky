@@ -87,16 +87,26 @@ void app_initIO(){
 
 // alive LED status task.
 void app_iol_aliveTask(){
-	
 	if((millis() - led_millis) > PERIOD_ALIVE_TASK){
 		led_millis = millis();
 		
-		if(iol_dl_getModeStatus() == DL_MODE_OP){
-			iol_pl_connectedLED();
-		}else{
-			iol_pl_standbyLED();
+		switch(app_psu_status()){
+			case PSU_STATE_INIT:
+			case PSU_STATE_IDLE:
+			case PSU_STATE_NORMAL:
+			{
+				if(iol_dl_getModeStatus() == DL_MODE_OP){
+					iol_pl_connectedLED();
+				}else{
+					iol_pl_standbyLED();
+				}
+			}
+			break;
+			
+			default:
+				iol_pl_faultLED();
+			break;
 		}
-		
 	}
 }
 
