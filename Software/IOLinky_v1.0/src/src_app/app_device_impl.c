@@ -68,12 +68,6 @@ void app_initGPIO(){
 		//(1 << (IOL_mon * 2))		|	// IO-Link activity monitoring pin
 		(1 << (ENBuck_Pin * 2))	;	// Buck converter enable pin
 
-// Temporary (currently testing with GD32E232 board)
-	GPIO_CTL(GPIOB) |=
-		(3 << (3 * 2))	|
-		(3 << (4 * 2))	|
-		(3 << (5 * 2));
-
 }
 
 // Init IO system
@@ -91,9 +85,7 @@ void app_initIO(){
 	);
 }
 
-// Task to serve alive LED status.
-// Warning, the green LED is so bright
-// So freaking bright it is k*lling me (ToT).
+// alive LED status task.
 void app_iol_aliveTask(){
 	
 	if((millis() - led_millis) > PERIOD_ALIVE_TASK){

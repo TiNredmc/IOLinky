@@ -23,7 +23,7 @@
 
 // Super loop define-s
 // define task period in ms unit
-#define PERIOD_ALIVE_TASK	(100 * 10)// 100ms
+#define PERIOD_ALIVE_TASK	(10 * 10)// 10ms
 #define PERIOD_PD_TASK		(20 * 10)	// 20ms
 #define PERIOD_PSU_TASK		(1 * 10)  // 1ms
 
