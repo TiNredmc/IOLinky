@@ -20,6 +20,7 @@ void l6362_init(uint8_t commode){
 		32,
 		l6362_read_fifo,
 		l6362_write_fifo);
+	usart_resetReadIdx();
 }
 
 void l6362_setMseq(
