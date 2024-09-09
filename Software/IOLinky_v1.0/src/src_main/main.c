@@ -1,4 +1,4 @@
-// IO-Link device example with L6362 on STM32F042
+// IO-Linky V1.0 
 #include "main.h"
 
 typedef struct myFunctions{
