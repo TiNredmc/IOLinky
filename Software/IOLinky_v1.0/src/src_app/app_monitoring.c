@@ -7,55 +7,63 @@ int32_t Efuse_Sigma = 0;
 uint32_t Efuse_DifferentOfSquare = 0;
 
 void app_mon_checkVin(){
-	if(psu_mondata_t.PSU_status_b.Buck_en){
-		if(psu_mondata_t.VIsense_val < THRESHOLD_VIN_LO){
-			psu_mondata_t.PSU_status_b.VIn_ok = 0;
+	// Input Undervoltage check
+	if(psu_mondata_t.PSU_status_b.VIn_UV == 0){
+		if(psu_mondata_t.VIsense_val < THRESHOLD_VIN_LO_DN){
 			psu_mondata_t.PSU_status_b.VIn_UV = 1;
-			psu_mondata_t.PSU_status_b.VIn_OV = 0;
-		}else if(psu_mondata_t.VIsense_val > THRESHOLD_VIN_HI){
-			psu_mondata_t.PSU_status_b.VIn_ok = 0;
-			psu_mondata_t.PSU_status_b.VIn_UV = 0;
-			psu_mondata_t.PSU_status_b.VIn_OV = 1;
-		}else{
-			psu_mondata_t.PSU_status_b.VIn_ok = 0;
-			psu_mondata_t.PSU_status_b.VIn_UV = 0;
 			psu_mondata_t.PSU_status_b.VIn_OV = 0;
 		}
 	}else{
-		if(psu_mondata_t.VIsense_val > THRESHOLD_VIN_HI){
-			psu_mondata_t.PSU_status_b.VIn_ok = 0;
+		if(psu_mondata_t.VIsense_val > THRESHOLD_VIN_LO_UP){
 			psu_mondata_t.PSU_status_b.VIn_UV = 0;
-			psu_mondata_t.PSU_status_b.VIn_OV = 1;
-		}else{
-			psu_mondata_t.PSU_status_b.VIn_ok = 0;
-			psu_mondata_t.PSU_status_b.VIn_UV = 0;
-			psu_mondata_t.PSU_status_b.VIn_OV = 0;
 		}
 	}
+	
+	// Input Overvoltage check
+	if(psu_mondata_t.VIsense_val > THRESHOLD_VIN_HI){
+		psu_mondata_t.PSU_status_b.VIn_OV = 1;
+		psu_mondata_t.PSU_status_b.VIn_UV = 0;
+	}else{
+		psu_mondata_t.PSU_status_b.VIn_OV = 0;
+	}
+	
+	// Determine whether input is ok or not
+	if(
+		!(psu_mondata_t.PSU_status_b.VIn_UV) &&
+		!(psu_mondata_t.PSU_status_b.VIn_OV)
+	)
+		psu_mondata_t.PSU_status_b.VIn_ok = 1;
+	else
+		psu_mondata_t.PSU_status_b.VIn_ok = 0;
 	
 }
 
 void app_mon_checkVout(){
-	if(psu_mondata_t.PSU_status_b.Buck_en){
-		if(psu_mondata_t.VOsense_val < THRESHOLD_VO_LO){
-			psu_mondata_t.PSU_status_b.VOut_ok = 0;
-			psu_mondata_t.PSU_status_b.VOut_UV = 1;
-		}else{
-			psu_mondata_t.PSU_status_b.VOut_ok = 1;
-			psu_mondata_t.PSU_status_b.VOut_UV = 0;
-		}
-	}else{
-		psu_mondata_t.PSU_status_b.VOut_ok = 0;
-		psu_mondata_t.PSU_status_b.VOut_UV = 0;
-	}
-	
 	if(psu_mondata_t.VOsense_val > THRESHOLD_VO_HI){
 		psu_mondata_t.PSU_status_b.VOut_ok = 0;
+		psu_mondata_t.PSU_status_b.VOut_UV = 0;
 		psu_mondata_t.PSU_status_b.VOut_OV = 1;
 	}else{
-		psu_mondata_t.PSU_status_b.VOut_ok = 1;
-		psu_mondata_t.PSU_status_b.VOut_OV = 0;
-	}
+		if(psu_mondata_t.PSU_status_b.Buck_en){
+			if(
+				(psu_mondata_t.VOsense_val > THRESHOLD_VO_LO) &&
+				(psu_mondata_t.VOsense_val < THRESHOLD_VO_HI)
+			){
+				psu_mondata_t.PSU_status_b.VOut_ok = 1;
+				psu_mondata_t.PSU_status_b.VOut_UV = 0;
+				psu_mondata_t.PSU_status_b.VOut_OV = 0;
+			}else if(psu_mondata_t.VOsense_val < THRESHOLD_VO_LO){
+				psu_mondata_t.PSU_status_b.VOut_ok = 0;
+				psu_mondata_t.PSU_status_b.VOut_UV = 1;
+				psu_mondata_t.PSU_status_b.VOut_OV = 0;
+			}
+		}else{
+			psu_mondata_t.PSU_status_b.VOut_ok = 0;
+			psu_mondata_t.PSU_status_b.VOut_UV = 0;
+			psu_mondata_t.PSU_status_b.VOut_OV = 0;
+		}
+	}	
+	
 }
 
 void app_mon_checkIout(){
