@@ -7,16 +7,13 @@ void clk_enableHXTAL(){
 
 // Initialize system clock
 void clk_initSysClk(){
-	
-	//clk_enableHXTAL();
-	
 	// Using internal IRC8M through PLL to get 72MHz
-	// 8Mhz * 1/2 * PLLMF
-	// PLLMF multiply factor is 8 
+	// 8MHz * 1/2 * PLLMF
+	// 4MHz * 18 -> 72MHz
+	// PLLMF multiply factor is 18 -> 0x11 in register value 
 	
 	RCU_CFG0 |= 
-	//	(1 << 16)	| // HXTAL as PLL clock source
-		(7 << 18);// Set PLLMF
+		(0x11 << 18);// Set PLLMF
 	RCU_CTL0 |= (1 << 24);// Enable PLL
 	// Wait for PLL stabilized
 	while(!(RCU_CTL0 & (1 << 25)));
