@@ -275,7 +275,9 @@ void app_psu_runner(){
 		case PSU_STATE_PWROFF:
 		{
 			// If powered on
-			if(psu_mondata_t.PSU_status_b.Buck_en){
+			if(
+				psu_mondata_t.PSU_status_b.VIn_ok &&
+				psu_mondata_t.PSU_status_b.Buck_en){
 				PSU_fsm = PSU_STATE_INIT;
 			}else{
 				// TODO : Always check Vin even though
