@@ -75,7 +75,7 @@ void usart_initIOLink(
 			break;
 				
 		case COM3:// 230.4 kBaud
-			USART_BAUD(USART1) |= 0x0140;
+			USART_BAUD(USART1) |= 0x012A;
 			break;
 		
 		default:// Default at COM2
