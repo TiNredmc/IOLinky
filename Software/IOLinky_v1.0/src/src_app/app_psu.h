@@ -20,9 +20,9 @@
 #define THRESHOLD_VIN_HI	3515 // around 25.5V	
 
 // Calculation from Vo to ADC
-// (Vin/2) * (4095 / 3.3)
-#define THRESHOLD_VO_LO		2792 // around 4.5V
-#define THRESHOLD_VO_HI		3412 // around 5.5v
+// (Vin/2.27) * (4095 / 3.3)
+#define THRESHOLD_VO_LO		2459 // around 4.5V
+#define THRESHOLD_VO_HI		3006 // around 5.5v
 
 // Calculation from Current to ADC
 // (I*0.01*50) * (4095 / 3.3)

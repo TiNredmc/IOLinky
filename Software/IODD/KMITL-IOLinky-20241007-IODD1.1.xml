@@ -35,6 +35,7 @@
 	<DeviceFunction>
 	
       <Features blockParameter="false" dataStorage="false">
+		<SupportedAccessLocks parameter="false" dataStorage="false" localUserInterface="false" localParameterization="false" />
       </Features>
 	  
       <!-- <DatatypeCollection> -->
@@ -322,7 +323,7 @@
 			<ProcessDataRecordItemInfo subindex="16" />
 			
             <ProcessDataRecordItemInfo subindex="17" unitCode="1209" gradient="0.0016" displayFormat="Dec.2"/>
-			<ProcessDataRecordItemInfo subindex="18" unitCode="1240" gradient="0.0016" displayFormat="Dec.2"/>
+			<ProcessDataRecordItemInfo subindex="18" unitCode="1240" gradient="0.0018" displayFormat="Dec.2"/>
 			<ProcessDataRecordItemInfo subindex="19" unitCode="1240" gradient="0.00747" displayFormat="Dec.1"/>
           </ProcessDataRef>
 		  
