@@ -13,10 +13,13 @@ void clk_initSysClk(){
 	// PLLMF multiply factor is 18 -> 0x11 in register value 
 	
 	RCU_CFG0 |= 
-		(0x11 << 18);// Set PLLMF
+		(0x01 << 27)	|// Set PLLMF bit 4
+	(0x01 << 18)	;// Set PLLMF bit [3:0]
 	RCU_CTL0 |= (1 << 24);// Enable PLL
 	// Wait for PLL stabilized
 	while(!(RCU_CTL0 & (1 << 25)));
+	
+	FMC_WS |= 2;// 2 wait state for flash
 	
 	// Switch System clock source to PLL
 	RCU_CFG0 |= 2;

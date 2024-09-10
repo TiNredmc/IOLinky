@@ -67,11 +67,11 @@ void usart_initIOLink(
 		
 	switch(com_mode){
 		case COM1:// 4.8 kBaud
-			USART_BAUD(USART1) |= 0x3AA0;
+			USART_BAUD(USART1) |= 0x3AA0;// Wrong baud
 			break;
 		
 		case COM2:// 38.4 kBaud
-			USART_BAUD(USART1) |= 0x0770;
+			USART_BAUD(USART1) |= 0x0750;
 			break;
 				
 		case COM3:// 230.4 kBaud
@@ -79,7 +79,7 @@ void usart_initIOLink(
 			break;
 		
 		default:// Default at COM2
-			USART_BAUD(USART1) |= 0x0770;
+			USART_BAUD(USART1) |= 0x0750;
 			break;
 	}
 	
