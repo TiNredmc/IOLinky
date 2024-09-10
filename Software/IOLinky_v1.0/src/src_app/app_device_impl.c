@@ -73,7 +73,7 @@ void app_initGPIO(){
 // Init IO system
 void app_initIO(){
 	clk_initSysClk();								// Setup system clock
-	systick_init(F_CPU/8, 10000);			// Setup 10kHz systick
+	systick_init(F_CPU, 10000);			// Setup 10kHz systick
 	
 	app_initGPIO();
 	
