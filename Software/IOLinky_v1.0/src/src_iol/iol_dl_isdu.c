@@ -233,14 +233,14 @@ void iol_dl_craftISDURead(){
 		{
 			ISDU_data_count = 1 + 8 + 1;// I-service + PD + checksum
 			ISDU_out_buffer[0] |= ISDU_data_count;// Length
-			ISDU_out_buffer[2] = *pdIn_ptr;
-			ISDU_out_buffer[1] = *(pdIn_ptr+1);
-			ISDU_out_buffer[4] = *(pdIn_ptr+2);
-			ISDU_out_buffer[3] = *(pdIn_ptr+3);
-			ISDU_out_buffer[6] = *(pdIn_ptr+4);
-			ISDU_out_buffer[5] = *(pdIn_ptr+5);
-			ISDU_out_buffer[8] = *(pdIn_ptr+6);
-			ISDU_out_buffer[7] = *(pdIn_ptr+7);
+			ISDU_out_buffer[8] = *pdIn_ptr;
+			ISDU_out_buffer[7] = *(pdIn_ptr+1);
+			ISDU_out_buffer[6] = *(pdIn_ptr+2);
+			ISDU_out_buffer[5] = *(pdIn_ptr+3);
+			ISDU_out_buffer[4] = *(pdIn_ptr+4);
+			ISDU_out_buffer[3] = *(pdIn_ptr+5);
+			ISDU_out_buffer[2] = *(pdIn_ptr+6);
+			ISDU_out_buffer[1] = *(pdIn_ptr+7);
 			
 			goto isdu_exit;
 		}
@@ -281,6 +281,8 @@ isdu_exit:
 
 void iol_dl_craftISDUWrite(){
 	uint16_t isdu_idx = 0;
+	uint8_t isdu_write_amount = 0;
+	
 	
 	// Parse Index
 	if(ISDU_16bIndex == 1){
@@ -294,6 +296,12 @@ void iol_dl_craftISDUWrite(){
 		isdu_idx = iol_iservice.Index[0];
 	}
 	
+	if(iol_iservice.length == 1){
+		isdu_write_amount = iol_iservice.ExtLength;
+	}else{
+		isdu_write_amount = iol_iservice.length;
+	}
+	
 	ISDU_data_count = 2;
 	ISDU_out_buffer[0] = 0x50 | 2;// Default write Response (+) I-service;
 	
@@ -305,7 +313,21 @@ void iol_dl_craftISDUWrite(){
 		}
 		break;
 	
+		default:
+			// Preferred Index (used for vendor specific funciton)
+			if(
+				(isdu_idx > 0x0039) &&
+				(isdu_idx < 0x00FF)
+			){
+			
+			}
+		
+		
+			break;
 	}
+	
+	
+	
 	// Calculate checksum
 	ISDU_out_buffer[1] = 0x00;
 	ISDU_out_buffer[1] = ISDU_out_buffer[0] ^ ISDU_out_buffer[1];
