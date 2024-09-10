@@ -205,10 +205,10 @@
 			  <RecordItem subindex="12" bitOffset="11">
                 <SimpleDatatype xsi:type="BooleanT">
                   <SingleValue value="true">
-                    <Name textId="IOL_YES" />
+                    <Name textId="IOL_ON" />
                   </SingleValue>
                   <SingleValue value="false">
-                    <Name textId="IOL_NO" />
+                    <Name textId="IOL_OFF" />
                   </SingleValue>
                 </SimpleDatatype>
                 <Name textId="IOL_Buck_EN" />
@@ -321,9 +321,9 @@
 			<ProcessDataRecordItemInfo subindex="15" />
 			<ProcessDataRecordItemInfo subindex="16" />
 			
-            <ProcessDataRecordItemInfo subindex="17" unitCode="1209" gradient="0.001611722" displayFormat="Dec.3"/>
-			<ProcessDataRecordItemInfo subindex="18" unitCode="1240" gradient="0.001611722" displayFormat="Dec.3"/>
-			<ProcessDataRecordItemInfo subindex="19" unitCode="1240" gradient="0.007252747" displayFormat="Dec.3"/>
+            <ProcessDataRecordItemInfo subindex="17" unitCode="1209" gradient="0.0016" displayFormat="Dec.2"/>
+			<ProcessDataRecordItemInfo subindex="18" unitCode="1240" gradient="0.0016" displayFormat="Dec.2"/>
+			<ProcessDataRecordItemInfo subindex="19" unitCode="1240" gradient="0.00747" displayFormat="Dec.1"/>
           </ProcessDataRef>
 		  
         </ProcessDataRefCollection>
@@ -427,9 +427,15 @@
   <ExternalTextCollection>
 
     <PrimaryLanguage xml:lang="en">
-	  <Text id="IOL_YES" value="yes" />
-	  <Text id="IOL_NO" value="no" />
+	  <Text id="IOL_YES" value="Yes" />
+	  <Text id="IOL_NO" value="No" />
 	  <Text id="IOL_NA" value="not available" />
+	  
+	  <Text id="IOL_OK" value="Okay" />
+	  <Text id="IOL_NOK" value="Not Okay" />
+	  
+	  <Text id="IOL_ON" value="ON" />
+	  <Test id="IOL_OFF" value="OFF" />
 	  
       <Text id="IOL_VendorText" value="KMITL" />
       <Text id="IOL_Device_Name" value="IO-Linky" />
@@ -454,7 +460,7 @@
 	  <Text id="IOL_Efuse_ACT" value="EFuse activated" />
 	  <Text id="IOL_Efuse_TRIP" value="EFuse tripped" />
 	  
-	  <Text id="IOL_Buck_EN" value="Buck converter on" />
+	  <Text id="IOL_Buck_EN" value="Buck converter status" />
 	  
 	  <Text id="IOL_Iout_mon" value="Output current" />
 	  <Text id="IOL_Vin_mon" value="Input voltage" />
