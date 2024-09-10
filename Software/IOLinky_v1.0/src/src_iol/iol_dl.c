@@ -90,10 +90,8 @@ void iol_dl_init(
 void iol_dl_poll(){
 	// If no communication for some period of time
 	// Fall back to STARTUP to be ready for next initiation
-	// Timeout at 48Mhz -O balance ~1 second-ish
-	// Timeout at 72Mhz -O balance -> to be measured
 	timeout_counter++;
-	if(timeout_counter == 0x8FA57){
+	if(timeout_counter == 0xFA57){
 		timeout_counter = 0;
 		
 		iol_pl_setMtype0();
