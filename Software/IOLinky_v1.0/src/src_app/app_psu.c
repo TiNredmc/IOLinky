@@ -3,10 +3,12 @@
 // Private variables
 uint8_t PSU_fsm = 0;
 
-uint8_t cycledelay_sc_trip = 0;
-uint8_t cycledelay_vout_not_ok = 0;
+uint16_t cycledelay_sc_trip = 0;
+uint16_t cycledelay_vout_not_ok = 0;
 
-uint8_t sc_trip_cnt = 0;
+uint16_t sc_trip_cnt = 0;
+
+uint16_t hiccup_delay = 0;
 
 uint8_t buck_pwrOn_flag = 0;
 uint8_t buck_pwrOff_flag = 0;
@@ -124,12 +126,12 @@ void app_psu_runner(){
 				break;
 			}
 			
-			// Check if Vout is Overvolt
+			// Check Vout error
 			if(
-			!psu_mondata_t.PSU_status_b.VOut_ok &&
-			psu_mondata_t.PSU_status_b.VOut_OV
+			!psu_mondata_t.PSU_status_b.VOut_ok			
 			){
 				PSU_fsm = PSU_STATE_VOUT_NOK;
+				
 				break;
 			}
 			
@@ -160,14 +162,15 @@ void app_psu_runner(){
 			if(
 			psu_mondata_t.PSU_status_b.VOut_ok 	&&
 			psu_mondata_t.PSU_status_b.IOut_ok	&&
-			psu_mondata_t.PSU_status_b.IOut_SC
+			!psu_mondata_t.PSU_status_b.IOut_SC
 			){
 				cycledelay_vout_not_ok = 0;// Reset SC trip
 				PSU_fsm = PSU_STATE_NORMAL;
 			}else{
 				// Overvoltage more than TIMEOUT_VO_OV
 				// Trip and enter halt
-				if(cycledelay_sc_trip > TIMEOUT_VO_OV){
+				if(cycledelay_vout_not_ok > TIMEOUT_VO_OV){
+					cycledelay_vout_not_ok = 0;// Reset SC trip
 					app_psu_disableBuck();
 					PSU_fsm = PSU_STATE_HALT;
 				}
@@ -254,6 +257,7 @@ void app_psu_runner(){
 				// Shutdown buck converter and 
 				// enter halt state
 				if(cycledelay_sc_trip > TIMEOUT_SC){
+					cycledelay_sc_trip = 0;// Reset SC trip
 					app_psu_disableBuck();
 					PSU_fsm = PSU_STATE_HALT;
 				}
@@ -266,7 +270,14 @@ void app_psu_runner(){
 		// Cause : Short circuit, Vin or Vout fault
 		case PSU_STATE_HALT:
 		{
+			hiccup_delay++;
 			
+			if(hiccup_delay == 3000){
+				hiccup_delay = 0;
+				app_mon_efuseReset();
+				app_psu_enableBuck();
+				PSU_fsm = PSU_STATE_NORMAL;
+			}
 		}
 		break;
 		
@@ -282,8 +293,7 @@ void app_psu_runner(){
 			}else{
 				// TODO : Always check Vin even though
 				// the PSU is off
-				
-				
+
 				
 				PSU_fsm = PSU_STATE_PWROFF;
 			}

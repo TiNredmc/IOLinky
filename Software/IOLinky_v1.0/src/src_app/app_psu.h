@@ -6,8 +6,12 @@
 #include "adc.h"
 
 // PSU error timeout before halt
-#define TIMEOUT_SC				3 // 3ms
-#define TIMEOUT_VO_OV			5 // 5ms
+#define TIMEOUT_SC				300 // 300ms
+#define TIMEOUT_VO_OV			500 // 500ms
+
+// Recovery wait
+#define RECOVER_HICCUP		3000 // 3 sec
+
 
 // PSU Voltage threshold
 
