@@ -91,7 +91,7 @@ void iol_dl_poll(){
 	// If no communication for some period of time
 	// Fall back to STARTUP to be ready for next initiation
 	timeout_counter++;
-	if(timeout_counter == 0xFA57){
+	if(timeout_counter == 0x5FA57){
 		timeout_counter = 0;
 		
 		iol_pl_setMtype0();
