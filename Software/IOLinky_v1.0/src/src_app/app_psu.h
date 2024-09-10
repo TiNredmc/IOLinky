@@ -37,7 +37,7 @@
 // Inom is 3A
 // Pick Ipeak at 3.8A
 // Allowed t time at 3.8A is 6000ms
-// Number max according to Uint32_t
+// Number max according to int32_t
 // 
 // Actual calculation performed inside MCU
 // ((Imeasured - Inom) * (Imeasured + Inom)) >> 10

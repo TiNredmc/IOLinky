@@ -1,10 +1,10 @@
 #include "app_psu.h"
 
 // Private variables
-uint32_t Efuse_integrator = 0;
-uint32_t Efuse_Delta = 0;
-int32_t Efuse_Sigma = 0;
-uint32_t Efuse_DifferentOfSquare = 0;
+uint16_t Efuse_Sigma = 0;
+int16_t Efuse_Delta = 0;
+int32_t Efuse_DifferentOfSquare = 0;
+int32_t Efuse_integrator = 0;
 
 void app_mon_checkVin(){
 	// Input Undervoltage check
@@ -122,34 +122,40 @@ void app_mon_checkIout(){
 }
 
 void app_mon_efuseRunner(){
-	if(
-	psu_mondata_t.PSU_status_b.IOut_ok && 
-	psu_mondata_t.PSU_status_b.IOut_OC &&
-	!psu_mondata_t.PSU_status_b.IOut_SC &&
-	psu_mondata_t.PSU_status_b.Efuse_Act &&
-	!psu_mondata_t.PSU_status_b.Efuse_Trip 
-	){
+//	if(
+//	psu_mondata_t.PSU_status_b.IOut_ok && 
+//	psu_mondata_t.PSU_status_b.IOut_OC &&
+//	!psu_mondata_t.PSU_status_b.IOut_SC &&
+//	psu_mondata_t.PSU_status_b.Efuse_Act &&
+//	!psu_mondata_t.PSU_status_b.Efuse_Trip 
+//	){
 		Efuse_Sigma = 
 			psu_mondata_t.IOsense_val + 
 			THRESHOLD_IO_NOM;
 		
 		Efuse_Delta = 
-			(int32_t)psu_mondata_t.IOsense_val -
-			THRESHOLD_IO_NOM;
+			(int16_t)(
+			psu_mondata_t.IOsense_val -
+			THRESHOLD_IO_NOM
+			);
 		
 		Efuse_DifferentOfSquare = 
-			(Efuse_Delta * Efuse_Delta);
-		Efuse_DifferentOfSquare = 
-			Efuse_DifferentOfSquare  >> 10;
+			(int32_t)(Efuse_Sigma * Efuse_Delta) >> 
+			10; 
 		
 		Efuse_integrator += Efuse_DifferentOfSquare;
+		
+		// Cap lower end when current consumption
+		// returns to lower that Inom
+		if(Efuse_integrator < 0)
+			Efuse_integrator = 0;
 		
 		if(Efuse_integrator > THRESHOLD_EFUSE){
 			psu_mondata_t.PSU_status_b.Efuse_Trip = 1;
 			psu_mondata_t.PSU_status_b.IOut_ok = 0;
 		}
 		
-	}
+//	}
 }
 
 void app_mon_efuseReset(){
