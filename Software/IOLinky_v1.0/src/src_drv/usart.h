@@ -18,22 +18,19 @@ enum IOL_COM_MODE{
 void usart_initIOLink(
 	uint8_t com_mode,				// IO-Link COM speed
 	uint8_t read_size_max,	// RX buffer size
-	uint8_t *read_ptr,				// RX buffer
-	uint8_t *write_ptr				// TX buffer
-	);
+	uint8_t *read_ptr				// RX buffer	
+);
+	
+void usart_setReadPtr(uint8_t *read_ptr);
 
 void usart_writeRequest(
-	uint8_t count);
+	uint8_t count,
+	uint8_t *wr_ptr);
 uint8_t usart_pollWrite();
 
 uint8_t usart_getReadIdx();
 void usart_resetReadIdx();
 
 uint8_t usart_getPEStatus();
-
-void usart_dmaWriteStart(
-	uint8_t *data_ptr, 
-	uint8_t data_len
-	);
 
 #endif

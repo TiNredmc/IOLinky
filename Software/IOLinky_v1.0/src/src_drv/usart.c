@@ -48,8 +48,7 @@ void USART1_IRQHandler(void){
 void usart_initIOLink(
 	uint8_t com_mode,				// IO-Link COM speed
 	uint8_t read_size_max,	// RX buffer size
-	uint8_t *read_ptr,				// RX buffer
-	uint8_t *write_ptr				// TX buffer
+	uint8_t *read_ptr				// RX buffer
 	){
 		
 	RCU_APB1EN |= (1 << 17);// Enable USART1 Clock
@@ -85,7 +84,6 @@ void usart_initIOLink(
 	
 	rx_size_max = read_size_max;
 	rx_ptr = read_ptr;
-	tx_ptr = write_ptr;
 	
 	NVIC_SetPriority(USART1_IRQn, 3);
 	NVIC_ClearPendingIRQ(USART1_IRQn);
@@ -95,6 +93,13 @@ void usart_initIOLink(
 	
 }
 	
+void usart_setReadPtr(uint8_t *read_ptr){
+	if(read_ptr == 0)
+		return;
+	
+	rx_ptr = read_ptr;
+}
+
 void usart_enableTX(){
 	USART_CTL0(USART1) &= ~(1 << 2);//  Disable Receiver
 	GPIO_OCTL(GPIOA) |= (1 << EN_pin);
@@ -106,10 +111,11 @@ void usart_disableTX(){
 }
 
 void usart_writeRequest(
-	uint8_t count){
+	uint8_t count,
+	uint8_t *wr_ptr){
 	
 	// Passing null pointer is a no no
-	if(tx_ptr == 0)
+	if(wr_ptr == 0)
 		return;
 	
 	// Count is 0, no write.
@@ -119,8 +125,9 @@ void usart_writeRequest(
 	// Uart busy writing, request denied
 	if(uart_tx_fsm != 0)
 		return;
-		
+	
 	tx_size = count;		
+	tx_ptr = wr_ptr;
 }
 
 uint8_t usart_pollWrite(){
@@ -132,12 +139,12 @@ uint8_t usart_pollWrite(){
 			if(tx_size > 0){
 				tx_idx = 0;// reset index pointer
 				usart_enableTX();
-				uart_tx_fsm = 1;
+				uart_tx_fsm = 2;
 			}
 		}
 		break;
 		
-		case 1:// Check if TX is empty and TX is enabled
+		case 1:// Check if TX is empty
 		{
 			if((USART_STAT(USART1) & (1 << 7)))
 					uart_tx_fsm = 2;
@@ -187,16 +194,4 @@ uint8_t usart_getPEStatus(){
 	
 	usart_pe_flag = 0;
 	return 1;
-}
-
-void usart_dmaWriteStart(
-	uint8_t *data_ptr, 
-	uint8_t data_len
-	){
-		
-	uint32_t *temp;
-	
-	temp = (uint32_t *)&data_ptr;
-		
-
 }
