@@ -28,6 +28,7 @@ void app_initGPIO(){
 		);
 
 	GPIO_CTL(GPIOA) |= 
+		(1 << (IOL_mon * 2))		|	// IO-Link activity monitoring pin
 		(0 << (OL_pin * 2)) 			| // Input 
 		(2 << (USART2_TX * 2)) 		| // AF1
 		(2 << (USART2_RX * 2)) 		| // AF1
@@ -60,12 +61,10 @@ void app_initGPIO(){
 	// IO-Link monitoring LED
 	GPIO_CTL(GPIOB) &=
 		~(
-		//(3 << (IOL_mon * 2))		|
 		(3 << (ENBuck_Pin * 2))	
 		);
 		
 	GPIO_CTL(GPIOB) |= 
-		//(1 << (IOL_mon * 2))		|	// IO-Link activity monitoring pin
 		(1 << (ENBuck_Pin * 2))	;	// Buck converter enable pin
 
 }
@@ -125,9 +124,9 @@ void app_iol_psuRunner(){
 }
 
 // Tasks that runs this IO-Link device
-void app_runner(){
-	app_iol_psuRunner();
+inline void app_runner(){
 	iol_al_poll();
+	app_iol_psuRunner();
 	app_iol_updatePDTask();
 	app_iol_aliveTask();
 }
