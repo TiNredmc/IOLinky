@@ -101,7 +101,7 @@ void iol_pl_faultLED(){
 
 // Poll reading from the L6364
 void iol_pl_pollRead(){
-		read_available = l6362_readFIFO(read_buffer_ptr);
+	read_available = l6362_readFIFO(read_buffer_ptr);
 	
 	if(l6362_parityChk()){
 		read_available = 0;
