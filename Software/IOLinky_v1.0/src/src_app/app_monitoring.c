@@ -1,5 +1,8 @@
 #include "app_psu.h"
 
+uint8_t Imon_delay = 0;
+uint8_t Vmon_delay = 0;
+
 // Private variables
 uint16_t Efuse_Sigma = 0;
 int16_t Efuse_Delta = 0;
@@ -73,28 +76,38 @@ void app_mon_checkIout(){
 			// More than Nominal current
 			if(psu_mondata_t.IOsense_val > THRESHOLD_IO_HI){
 				// More than High current -> Trip Efuse
-				psu_mondata_t.PSU_status_b.IOut_ok = 1;
-				psu_mondata_t.PSU_status_b.IOut_OC = 1;
-				psu_mondata_t.PSU_status_b.IOut_SC = 0;
-				psu_mondata_t.PSU_status_b.Efuse_Act = 1;
-				psu_mondata_t.PSU_status_b.Efuse_Trip = 1;
+				Imon_delay++;
+				
+				// 10ms IO high spike
+				if(Imon_delay > 10){
+					Imon_delay = 0;
+					psu_mondata_t.PSU_status_b.IOut_ok = 0;
+					psu_mondata_t.PSU_status_b.IOut_OC = 1;
+					psu_mondata_t.PSU_status_b.IOut_SC = 0;
+				}
+				
 			}else{
 				// Less than High current
 				if(psu_mondata_t.IOsense_val > THRESHOLD_IO_PEAK){
 					// More than Peak current -> OC activate Efuse
-					psu_mondata_t.PSU_status_b.IOut_ok = 1;
-					psu_mondata_t.PSU_status_b.IOut_OC = 1;
-					psu_mondata_t.PSU_status_b.IOut_SC = 0;
-					psu_mondata_t.PSU_status_b.Efuse_Act = 1;
-					psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
+					Imon_delay++;
+					
+					// 10ms IO PEAK
+					if(Imon_delay > 10){
+						Imon_delay = 0;
+						psu_mondata_t.PSU_status_b.IOut_ok = 1;
+						psu_mondata_t.PSU_status_b.IOut_OC = 1;
+						psu_mondata_t.PSU_status_b.IOut_SC = 0;
+					}
 				}else{
 					// nominal < I < Peak -> ok
 					psu_mondata_t.PSU_status_b.IOut_ok = 1;
 					psu_mondata_t.PSU_status_b.IOut_OC = 0;
 					psu_mondata_t.PSU_status_b.IOut_SC = 0;
-					psu_mondata_t.PSU_status_b.Efuse_Act = 0;
-					psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
+					
+					Imon_delay = 0;
 				}
+				
 			}
 		
 		}else{
@@ -102,71 +115,86 @@ void app_mon_checkIout(){
 			psu_mondata_t.PSU_status_b.IOut_ok = 1;
 			psu_mondata_t.PSU_status_b.IOut_OC = 0;
 			psu_mondata_t.PSU_status_b.IOut_SC = 0;
-			psu_mondata_t.PSU_status_b.Efuse_Act = 0;
-			psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
+			
+			Imon_delay = 0;
 		}
 	}else{
-		if(psu_mondata_t.IOsense_val > THRESHOLD_IO_SC){
+		if(
+			psu_mondata_t.PSU_status_b.Buck_en			&&
+			psu_mondata_t.IOsense_val > THRESHOLD_IO_SC){
 			// Short circuit detection
 			psu_mondata_t.PSU_status_b.IOut_ok = 0;
 			psu_mondata_t.PSU_status_b.IOut_OC = 1;
 			psu_mondata_t.PSU_status_b.IOut_SC = 1;
-		}else{
-			// In case of Output turned off
-			psu_mondata_t.PSU_status_b.IOut_ok = 0;
-			psu_mondata_t.PSU_status_b.IOut_OC = 0;
-			psu_mondata_t.PSU_status_b.IOut_SC = 0;
+			psu_mondata_t.PSU_status_b.Efuse_Act = 1;
+			psu_mondata_t.PSU_status_b.Efuse_Trip = 1;
 		}
+//		else{
+//			// In case of Output turned off
+//			psu_mondata_t.PSU_status_b.IOut_ok = 0;
+//			psu_mondata_t.PSU_status_b.IOut_OC = 0;
+//			psu_mondata_t.PSU_status_b.IOut_SC = 0;
+//			psu_mondata_t.PSU_status_b.Efuse_Act = 0;
+//			psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
+//		}
 	}
 	
 }
 
+// Efuse I2t algorithm
 void app_mon_efuseRunner(){
-//	if(
-//	psu_mondata_t.PSU_status_b.IOut_ok && 
-//	psu_mondata_t.PSU_status_b.IOut_OC &&
-//	!psu_mondata_t.PSU_status_b.IOut_SC &&
-//	psu_mondata_t.PSU_status_b.Efuse_Act &&
-//	!psu_mondata_t.PSU_status_b.Efuse_Trip 
-//	){
+		
+		// Stop counting when Efuse was already tripped.
+		if(psu_mondata_t.PSU_status_b.Efuse_Trip)
+			return;
+	
 		Efuse_Sigma = 
 			psu_mondata_t.IOsense_val + 
-			THRESHOLD_IO_NOM;
+			THRESHOLD_IO_PEAK;
 		
 		Efuse_Delta = 
 			(int16_t)(
 			psu_mondata_t.IOsense_val -
-			THRESHOLD_IO_NOM
+			THRESHOLD_IO_PEAK
 			);
 		
 		Efuse_DifferentOfSquare = 
 			(int32_t)(Efuse_Sigma * Efuse_Delta) >> 
-			10; 
+			10; // Divided by 1024, approximation of 1000ms
 		
 		Efuse_integrator += Efuse_DifferentOfSquare;
 		
 		// Cap lower end when current consumption
-		// returns to lower that Inom
-		if(Efuse_integrator < 0)
+		// returns to lower that Ipeak
+		if(Efuse_integrator < 0){
 			Efuse_integrator = 0;
+			psu_mondata_t.PSU_status_b.Efuse_Act = 0;
+			psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
+		}else{
+			psu_mondata_t.PSU_status_b.Efuse_Act = 1;
+		}
 		
-		if(Efuse_integrator > THRESHOLD_EFUSE){
+		if(Efuse_integrator > (int32_t)THRESHOLD_EFUSE){
 			psu_mondata_t.PSU_status_b.Efuse_Trip = 1;
 			psu_mondata_t.PSU_status_b.IOut_ok = 0;
 		}
-		
-//	}
 }
 
 void app_mon_efuseReset(){
 	Efuse_integrator = 0;
+	psu_mondata_t.PSU_status_b.Efuse_Act = 0;
+	psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
+}
+
+int32_t app_mon_getEfuse(){
+	return Efuse_integrator;
 }
 
 void app_mon_updateMonitoring(){
 	if(adc_getDataAvaible()){
 		app_mon_checkVin();
-		app_mon_checkVout();
 		app_mon_checkIout();
+		app_mon_checkVout();
 		app_mon_efuseRunner();
 		
 		adc_softTrigger();// Trigger next conversion

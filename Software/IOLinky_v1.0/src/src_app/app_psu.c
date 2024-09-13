@@ -3,12 +3,12 @@
 // Private variables
 uint8_t PSU_fsm = 0;
 
-uint16_t cycledelay_sc_trip = 0;
-uint16_t cycledelay_vout_not_ok = 0;
+uint32_t cycledelay_sc_trip = 0;
+uint32_t cycledelay_vout_not_ok = 0;
 
-uint16_t sc_trip_cnt = 0;
+uint32_t sc_trip_cnt = 0;
 
-uint16_t hiccup_delay = 0;
+uint32_t hiccup_delay = 0;
 
 uint8_t buck_pwrOn_flag = 0;
 uint8_t buck_pwrOff_flag = 0;
@@ -202,7 +202,7 @@ void app_psu_runner(){
 				PSU_fsm = PSU_STATE_NORMAL;
 			}else{
 				// TODO : timeout
-				
+				PSU_fsm = PSU_STATE_HALT;
 			}
 			
 		}
@@ -212,28 +212,19 @@ void app_psu_runner(){
 		// Cause : Overcurrent and Efuse kicked in
 		case PSU_STATE_OLP:
 		{
-			if(
-				psu_mondata_t.PSU_status_b.Efuse_Act &&
-				!psu_mondata_t.PSU_status_b.Efuse_Trip
-			){// Efuse integrating but not tripped yet.
-				// Wait
-			
-				PSU_fsm = PSU_STATE_OLP;
-			}else if(
-				psu_mondata_t.PSU_status_b.Efuse_Act &&
-				psu_mondata_t.PSU_status_b.Efuse_Trip
-			){// Efuse tripped, enter halt (for now)
-				// TODO : implement hiccup mode
-				PSU_fsm = PSU_STATE_HALT;
-				
-			
-			}else{// Efuse back to normal
+			if(psu_mondata_t.PSU_status_b.Efuse_Act){
+				if(psu_mondata_t.PSU_status_b.Efuse_Trip){
+					// Efuse tripped, enter halt
+					app_psu_disableBuck();
+					PSU_fsm = PSU_STATE_HALT;
+				}
+			}else{// reset Efuse back to normal
 				app_mon_efuseReset();
 				PSU_fsm = PSU_STATE_NORMAL;
-			}
-			
-			
+			}			
 		}
+		
+		
 		break;
 		
 		// State : Short circuit
@@ -250,7 +241,6 @@ void app_psu_runner(){
 			psu_mondata_t.PSU_status_b.IOut_SC
 			){
 				cycledelay_sc_trip = 0;// Reset SC trip
-				app_mon_efuseReset();
 				PSU_fsm = PSU_STATE_NORMAL;
 			}else{
 				// Short circuit more than TIMEOUT_SC
@@ -272,7 +262,7 @@ void app_psu_runner(){
 		{
 			hiccup_delay++;
 			
-			if(hiccup_delay == 3000){
+			if(hiccup_delay == RECOVER_HICCUP){
 				hiccup_delay = 0;
 				app_mon_efuseReset();
 				app_psu_enableBuck();

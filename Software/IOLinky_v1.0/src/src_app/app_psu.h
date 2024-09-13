@@ -10,7 +10,7 @@
 #define TIMEOUT_VO_OV			500 // 500ms
 
 // Recovery wait
-#define RECOVER_HICCUP		3000 // 3 sec
+#define RECOVER_HICCUP		5000 // 5 sec
 
 
 // PSU Voltage threshold
@@ -32,10 +32,10 @@
 // (I*0.01*50) * (4095 / 3.3)
 // (I/2) * (4095 / 3.3)
 // PSU Current threshold
-#define THRESHOLD_IO_NOM	1861 // around 3A
-#define THRESHOLD_IO_PEAK	2357 // around 3.8A
-#define THRESHOLD_IO_HI		2481 // around 4A
-#define THRESHOLD_IO_SC		2481 // short circuit at 4A
+#define THRESHOLD_IO_NOM	1887 // around 3A
+#define THRESHOLD_IO_PEAK	2201 // around 3.5A 
+#define THRESHOLD_IO_HI		2515 // around 4A ~130%
+#define THRESHOLD_IO_SC		2515 // short circuit at 4A
 // Efuse calculation
 // (Ipeak^2 - Inom^2) * t
 // Inom is 3A
@@ -46,7 +46,7 @@
 // Actual calculation performed inside MCU
 // ((Imeasured - Inom) * (Imeasured + Inom)) >> 10
 // All integer 
-#define THRESHOLD_EFUSE		15798000		 
+#define THRESHOLD_EFUSE		3592529	 
 
 
 typedef struct __attribute__((packed)){
@@ -103,5 +103,7 @@ void app_psu_runner();
 uint8_t app_psu_status();
 void app_psu_requestPWRON();
 void app_psu_requestPWROFF();
+
+int32_t app_mon_getEfuse();
 
 #endif

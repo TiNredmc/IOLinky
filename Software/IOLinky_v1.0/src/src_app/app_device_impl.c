@@ -93,6 +93,7 @@ void app_iol_aliveTask(){
 			case PSU_STATE_INIT:
 			case PSU_STATE_IDLE:
 			case PSU_STATE_NORMAL:
+			case PSU_STATE_PWROFF:
 			{
 				if(iol_dl_getModeStatus() == DL_MODE_OP){
 					iol_pl_connectedLED();
