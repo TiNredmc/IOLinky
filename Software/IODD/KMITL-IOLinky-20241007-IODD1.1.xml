@@ -60,6 +60,45 @@
         <StdVariableRef id="V_FirmwareRevision" defaultValue="E230_V1" />
         <StdVariableRef id="V_ProcessDataInput" />
 		
+		<Variable id="V_EFuseCount" index="253" accessRights="ro" dynamic="true">
+			<Datatype xsi:type="IntegerT" bitLength="32" />
+			<Name textId="IOL_DBG_EFuseCount"/>
+			<Description textId="IOL_DBG_EFuseCountDesc" />
+		</Variable>
+		<Variable id="V_PSUState" index="254" accessRights="ro" dynamic="true" >
+			<Datatype xsi:type="UIntegerT" bitLength="8">
+				<SingleValue value="0">
+					<Name textId="PSU_STATE_INIT"/>
+				</SingleValue>
+				<SingleValue value="1">
+					<Name textId="PSU_STATE_IDLE"/>
+				</SingleValue>
+				<SingleValue value="2">
+					<Name textId="PSU_STATE_NORMAL"/>
+				</SingleValue>
+				<SingleValue value="3">
+					<Name textId="PSU_STATE_VOUT_NOK"/>
+				</SingleValue>
+				<SingleValue value="4">
+					<Name textId="PSU_STATE_VIN_NOK"/>
+				</SingleValue>
+				<SingleValue value="5">
+					<Name textId="PSU_STATE_OLP"/>
+				</SingleValue>
+				<SingleValue value="6">
+					<Name textId="PSU_STATE_SC"/>
+				</SingleValue>
+				<SingleValue value="7">
+					<Name textId="PSU_STATE_HALT"/>
+				</SingleValue>
+				<SingleValue value="8">
+					<Name textId="PSU_STATE_PWROFF"/>
+				</SingleValue>
+			</Datatype>
+			<Name textId="IOL_DBG_PSUState"/>
+			<Description textId="IOL_DBG_PSUStateDesc" />
+		</Variable>
+		
       </VariableCollection>
 	  
       <ProcessDataCollection>
@@ -373,7 +412,13 @@
             <Name textId="IOL_M_Process_Data" />
             <VariableRef variableId="V_ProcessDataInput" />
           </Menu>
-
+		  
+		  <Menu id="M_Debug_Data">
+			<Name textId="IOL_M_Debug_Data" />
+			<MenuRef menuId="ME_Direct_Parameters" />
+			<VariableRef variableId="V_PSUState" />
+			<VariableRef variableId="V_EFuseCount" />
+		  </Menu>
         </MenuCollection>
 		
         <ObserverRoleMenuSet>
@@ -386,10 +431,10 @@
           <ParameterMenu menuId="ME_Direct_Parameters" />
           <ObservationMenu menuId="M_Process_Data" />
         </MaintenanceRoleMenuSet>
-		
+
         <SpecialistRoleMenuSet>
           <IdentificationMenu menuId="ME_Ident_Xtra" />
-          <ParameterMenu menuId="ME_Direct_Parameters" />
+          <ParameterMenu menuId="M_Debug_Data" />
           <ObservationMenu menuId="M_Process_Data" />
         </SpecialistRoleMenuSet>
 		
@@ -467,8 +512,26 @@
 	  <Text id="IOL_Vin_mon" value="Input voltage" />
 	  <Text id="IOL_Vout_mon" value="Output voltage" />
 	  
+	  <!-- Debug related -->
+	  
+	  <Text id="IOL_DBG_PSUState" value="PSU FSM state" />
+	  <Text id="IOL_DBG_PSUStateDesc" value="Current state of PSU FSM" />
+	  <Text id="PSU_STATE_INIT" value="PSU_STATE_INIT" />
+	  <Text id="PSU_STATE_IDLE" value="PSU_STATE_IDLE" />
+	  <Text id="PSU_STATE_NORMAL" value="PSU_STATE_NORMAL" />
+	  <Text id="PSU_STATE_VOUT_NOK" value="PSU_STATE_VOUT_NOK" />
+	  <Text id="PSU_STATE_VIN_NOK" value="PSU_STATE_VIN_NOK" />
+	  <Text id="PSU_STATE_OLP" value="PSU_STATE_OLP" />
+	  <Text id="PSU_STATE_SC" value="PSU_STATE_SC" />
+	  <Text id="PSU_STATE_HALT" value="PSU_STATE_HALT" />
+	  <Text id="PSU_STATE_PWROFF" value="PSU_STATE_PWROFF" />
+	  
+	  <Text id="IOL_DBG_EFuseCount" value="Efuse count" />
+	  <Text id="IOL_DBG_EFuseCountDesc" value="Efuse integrator count"/>
+	  
 	  <Text id="IOL_M_Process_Data" value="Process Data menu" />
 	  <Text id="IOL_M_DirectParam" value="Direct Parameter menu" />
+	  <Text id="IOL_M_Debug_Data" value="Debug Data menu" />
     </PrimaryLanguage>
 	
   </ExternalTextCollection>
