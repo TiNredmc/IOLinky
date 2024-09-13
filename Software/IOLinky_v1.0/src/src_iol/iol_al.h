@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "iol_dl.h"
 
+#include "app_psu.h"
+
 enum PREOP_MSEQ_CODE{
 	PREOP_M_0 = 0,
 	PREOP_M_1_2 = (1 << 4),
@@ -106,5 +108,11 @@ void iol_al_init(
 	);
 void iol_al_poll();
 void iol_al_updatePD();
+
+// For ISDU
+void iol_al_getSerialNumber();
+
+uint8_t iol_al_getPSUState();
+int32_t iol_al_getEfuseCount();
 
 #endif

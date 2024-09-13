@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "iol_pl.h"
+#include "iol_al.h"
 #include "gpio_pinout.h"
 
 // DL Main FSM enums

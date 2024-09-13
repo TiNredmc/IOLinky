@@ -246,6 +246,33 @@ void iol_dl_craftISDURead(){
 		}
 		break;
 		
+		case 0x00FD:// I2t Efuse integreator value
+		{
+			ISDU_data_count = 1 + 4 + 1;// I-service + Efuse data + checksum
+			int32_t efuse_temp = iol_al_getEfuseCount();
+			
+			ISDU_out_buffer[0] |= ISDU_data_count;
+			ISDU_out_buffer[1] = 
+				*(((uint8_t *)&efuse_temp) + 3);
+			ISDU_out_buffer[2] = 
+				*(((uint8_t *)&efuse_temp) + 2);
+			ISDU_out_buffer[3] = 
+				*(((uint8_t *)&efuse_temp) + 1);
+			ISDU_out_buffer[4] = 
+				*(((uint8_t *)&efuse_temp));
+			
+			goto isdu_exit;
+		}
+		
+		case 0x00FE:// PSU FSM state
+		{
+			ISDU_data_count = 1 + 1 + 1;// I-service + data + checksum
+			ISDU_out_buffer[0] |= ISDU_data_count;
+			ISDU_out_buffer[1] = iol_al_getPSUState();
+			
+			goto isdu_exit;
+		}
+			
 		default:
 			return;		
 	}
@@ -312,7 +339,7 @@ void iol_dl_craftISDUWrite(){
 			ISDU_data_offset_index = 0;
 		}
 		break;
-	
+		
 		default:
 			// Preferred Index (used for vendor specific funciton)
 			if(

@@ -1,5 +1,7 @@
 #include "iol_al.h"
 
+#define UNIQUEID_BASE	0x1FFFF7AC
+
 // Device's direct parameter data
 device_directparam_t device_dp_t = {
 	// Page 1
@@ -65,4 +67,16 @@ void iol_al_poll(){
 // Demo used to update Process Data.
 void iol_al_updatePD(){
 	iol_dl_updatePD();
+}
+
+void iol_al_getSerialNumber(){
+
+}
+
+uint8_t iol_al_getPSUState(){
+	return app_psu_status();
+}
+
+int32_t iol_al_getEfuseCount(){
+	return app_mon_getEfuse();
 }
