@@ -362,7 +362,7 @@
             </VariousControls>
           </Aads>
           <LDads>
-            <umfTarg>1</umfTarg>
+            <umfTarg>0</umfTarg>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
             <noStLib>0</noStLib>
@@ -371,7 +371,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile></ScatterFile>
+            <ScatterFile>.\Objects\IOLinky_v1.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -483,6 +483,16 @@
               <FileName>app_monitoring.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\src_app\app_monitoring.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_nvm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\src_app\app_nvm.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_nvm.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\src_app\app_nvm.h</FilePath>
             </File>
           </Files>
         </Group>
