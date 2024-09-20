@@ -60,6 +60,19 @@
         <StdVariableRef id="V_FirmwareRevision" defaultValue="E230_V1" />
         <StdVariableRef id="V_ProcessDataInput" />
 		
+		<Variable id="V_PSU_Enable" index="64" accessRights="wo">
+			<Datatype xsi:type="BooleanT" >
+			  <SingleValue value="true">
+				<Name textId="IOL_ON" />
+			  </SingleValue>
+			  <SingleValue value="false">
+				<Name textId="IOL_OFF" />
+			  </SingleValue>
+			</Datatype>
+			<Name textId="IOL_PSUEN" />
+			<Description textId="IOL_PSUEN" />
+		</Variable>
+		
 		<Variable id="V_EFuseCount" index="253" accessRights="ro" dynamic="true">
 			<Datatype xsi:type="IntegerT" bitLength="32" />
 			<Name textId="IOL_DBG_EFuseCount"/>
@@ -97,6 +110,58 @@
 			</Datatype>
 			<Name textId="IOL_DBG_PSUState"/>
 			<Description textId="IOL_DBG_PSUStateDesc" />
+		</Variable>
+		
+		<!-- Calibration and parameter related -->
+		<Variable id="V_Efuse_AmpHold" index="65" accessRights="rw" dynamics="true">
+			<Datatype xsi:type="UIntegerT" bitLength="32" />
+			<Name textId="IOL_Efuse_AmpHold" />
+			<Description textId="IOL_Efuse_AmpHold" />
+		</Variable>
+		
+		<Variable id="V_Efuse_PeriodHold" index="66" accessRights="rw" dynamics="true">
+			<Datatype xsi:type="UIntegerT" bitLength="32" />
+			<Name textId="IOL_Efuse_PeriodHold" />
+			<Description textId="IOL_Efuse_PeriodHold" />
+		</Variable>
+		
+		<Variable id="V_Cal_UnlockPW" index="256" accessRights="wo" dynamics="true">
+			<Datatype xsi:type="UIntegerT" bitLength="32" />
+			<Name textId="IOL_CAL_UnlockPW" />
+			<Description textId="IOL_CAL_UnlockPW" />
+		</Variable>
+		
+		<Variable id="V_CAL_ISENSE_SCALING" index="257" accessRights="rw" dynamnics="true">
+			<Datatype xsi:type="IntegerT" bitLength="32" />
+			<Name textId="IOL_CAL_ISENSE_SCALING" />
+			<Description textId="IOL_CAL_ISENSE_SCALING" />
+		</Variable>
+		<Variable id="V_CAL_ISENSE_OFFSET" index="258" accessRights="rw" dynamnics="true">
+			<Datatype xsi:type="IntegerT" bitLength="32" />
+			<Name textId="IOL_CAL_ISENSE_OFFSET" />
+			<Description textId="IOL_CAL_ISENSE_OFFSET" />
+		</Variable>
+		
+		<Variable id="V_CAL_VO_SCALING" index="259" accessRights="rw" dynamnics="true">
+			<Datatype xsi:type="IntegerT" bitLength="32" />
+			<Name textId="IOL_CAL_VO_SCALING" />
+			<Description textId="IOL_CAL_VO_SCALING" />
+		</Variable>
+		<Variable id="V_CAL_VO_OFFSET" index="260" accessRights="rw" dynamnics="true">
+			<Datatype xsi:type="IntegerT" bitLength="32" />
+			<Name textId="IOL_CAL_VO_OFFSET" />
+			<Description textId="IOL_CAL_VO_OFFSET" />
+		</Variable>
+		
+		<Variable id="V_CAL_VI_SCALING" index="261" accessRights="rw" dynamnics="true">
+			<Datatype xsi:type="IntegerT" bitLength="32" />
+			<Name textId="IOL_CAL_VI_SCALING" />
+			<Description textId="IOL_CAL_VI_SCALING" />
+		</Variable>
+		<Variable id="V_CAL_VI_OFFSET" index="262" accessRights="rw" dynamnics="true">
+			<Datatype xsi:type="IntegerT" bitLength="32" />
+			<Name textId="IOL_CAL_VI_OFFSET" />
+			<Description textId="IOL_CAL_VI_OFFSET" />
 		</Variable>
 		
       </VariableCollection>
@@ -361,16 +426,16 @@
 			<ProcessDataRecordItemInfo subindex="15" />
 			<ProcessDataRecordItemInfo subindex="16" />
 			
-            <ProcessDataRecordItemInfo subindex="17" unitCode="1209" gradient="0.0016" displayFormat="Dec.2"/>
-			<ProcessDataRecordItemInfo subindex="18" unitCode="1240" gradient="0.0018" displayFormat="Dec.2"/>
-			<ProcessDataRecordItemInfo subindex="19" unitCode="1240" gradient="0.00747" displayFormat="Dec.1"/>
+            <ProcessDataRecordItemInfo subindex="17" unitCode="1209" gradient="0.001612" displayFormat="Dec.2"/>
+			<ProcessDataRecordItemInfo subindex="18" unitCode="1240" gradient="0.001612" displayFormat="Dec.2"/>
+			<ProcessDataRecordItemInfo subindex="19" unitCode="1240" gradient="0.007326" displayFormat="Dec.1"/>
           </ProcessDataRef>
 		  
         </ProcessDataRefCollection>
 		
         <MenuCollection>
 		  
-          <Menu id="ME_Ident_Observe">
+          <Menu id="ME_Ident_OR">
             <!--System Command-->
             <VariableRef variableId="V_VendorName" />
             <VariableRef variableId="V_VendorText" />
@@ -380,7 +445,7 @@
             <VariableRef variableId="V_SerialNumber" />
           </Menu>
 		  
-		  <Menu id="ME_Ident_Xtra">
+		  <Menu id="ME_Ident_MR_SR">
             <!--System Command-->
 			<VariableRef variableId="V_VendorName" />
             <VariableRef variableId="V_VendorText" />
@@ -398,9 +463,13 @@
             <VariableRef variableId="V_SystemCommand" />
           </Menu>
 		  
-		  <Menu id="ME_Direct_Parameters">
-            <Name textId="IOL_M_DirectParam" />
-            <!--Mirror Input-->
+		  <Menu id="ME_Param_MR">
+			<VariableRef variableId="V_PSU_Enable" />
+			<MenuRef menuId="M_Efuse_Data" />
+          </Menu>
+		  
+		  <Menu id="ME_Param_SR">
+			<VariableRef variableId="V_PSU_Enable" />
             <RecordItemRef variableId="V_DirectParameters_1" subindex="2" />
             <RecordItemRef variableId="V_DirectParameters_1" subindex="3" />
             <RecordItemRef variableId="V_DirectParameters_1" subindex="4" />
@@ -409,33 +478,51 @@
           </Menu>
 		  
 		  <Menu id="M_Process_Data">
-            <Name textId="IOL_M_Process_Data" />
             <VariableRef variableId="V_ProcessDataInput" />
           </Menu>
 		  
+		  <Menu id="M_Efuse_Data">
+		    <Name textId="IOL_M_Efuse_Data"/>
+			<VariableRef variableId="V_Cal_UnlockPW" />
+			<VariableRef variableId="V_Efuse_AmpHold" unitCode="1211" gradient="1.612" displayFormat="Dec"/>
+			<VariableRef variableId="V_Efuse_PeriodHold" unitCode="1056"/>
+		  </Menu>
+		  
+		  <Menu id="M_Cal_Data">
+			<Name textId="IOL_M_Cal_Data" />
+			<VariableRef variableId="V_Cal_UnlockPW" />
+			<VariableRef variableId="V_CAL_ISENSE_SCALING" />
+			<VariableRef variableId="V_CAL_ISENSE_OFFSET" />
+			<VariableRef variableId="V_CAL_VO_SCALING" />
+			<VariableRef variableId="V_CAL_VO_OFFSET" />
+			<VariableRef variableId="V_CAL_VI_SCALING" />
+			<VariableRef variableId="V_CAL_VI_OFFSET" />
+		</Menu>
+		  
 		  <Menu id="M_Debug_Data">
-			<Name textId="IOL_M_Debug_Data" />
-			<MenuRef menuId="ME_Direct_Parameters" />
 			<VariableRef variableId="V_PSUState" />
-			<VariableRef variableId="V_EFuseCount" />
+			<VariableRef variableId="V_EFuseCount" unitCode="10520"/>
+			<MenuRef menuId="M_Cal_Data" />
 		  </Menu>
         </MenuCollection>
-		
+
         <ObserverRoleMenuSet>
-          <IdentificationMenu menuId="ME_Ident_Observe" />
+          <IdentificationMenu menuId="ME_Ident_OR" />
           <ObservationMenu menuId="M_Process_Data" />
         </ObserverRoleMenuSet>
 		
         <MaintenanceRoleMenuSet>
-          <IdentificationMenu menuId="ME_Ident_Observe" />
-          <ParameterMenu menuId="ME_Direct_Parameters" />
+          <IdentificationMenu menuId="ME_Ident_MR_SR" />
+          <ParameterMenu menuId="ME_Param_MR" />
           <ObservationMenu menuId="M_Process_Data" />
+		  <DiagnosisMenu menuId="M_Debug_Data" />
         </MaintenanceRoleMenuSet>
 
         <SpecialistRoleMenuSet>
-          <IdentificationMenu menuId="ME_Ident_Xtra" />
-          <ParameterMenu menuId="M_Debug_Data" />
+          <IdentificationMenu menuId="ME_Ident_MR_SR" />
+          <ParameterMenu menuId="ME_Param_SR" />
           <ObservationMenu menuId="M_Process_Data" />
+		  <DiagnosisMenu menuId="M_Debug_Data" />
         </SpecialistRoleMenuSet>
 		
       </UserInterface>
@@ -470,6 +557,10 @@
 	
   </CommNetworkProfile>
   
+  <UnitCollection>
+	<Unit code="10520" abbr="ADC²t" textId="IOL_ADC_SQR_T" />
+  </UnitCollection>
+  
   <ExternalTextCollection>
 
     <PrimaryLanguage xml:lang="en">
@@ -488,6 +579,8 @@
       <Text id="IOL_DeviceFamily" value="IO-Link" />
 	  <Text id="IOL_DeviceDescription" value="Open source IO-Link-compatible software stack demo" />
       <Text id="IOL_VendorUrl" value="https://www.kmitl.ac.th/" />
+	  
+	  <!-- Process Data related -->
 	  
 	  <Text id="IOL_Data_0" value="PSU status" />
 	  
@@ -512,6 +605,17 @@
 	  <Text id="IOL_Vin_mon" value="Input voltage" />
 	  <Text id="IOL_Vout_mon" value="Output voltage" />
 	  
+	  <!-- Parameter and control related -->
+	  <Text id="IOL_PSUEN" value="PSU Power switch" />
+	  <Text id="IOL_Efuse_AmpHold" value="Efuse holding current (mA)" />
+	  <Text id="IOL_Efuse_PeriodHold" value="Efuse holding period (ms)" />
+	  <Text id="IOL_CAL_ISENSE_SCALING" value="Output current calibration scaling" />
+	  <Text id="IOL_CAL_ISENSE_OFFSET" value="Output current calibration offset" />
+	  <Text id="IOL_CAL_VO_SCALING" value="Output voltage calibration scaling" />
+	  <Text id="IOL_CAL_VO_OFFSET" value="Output volatge calibration offset" />
+	  <Text id="IOL_CAL_VI_SCALING" value="Input voltage calibration scaling" />
+	  <Text id="IOL_CAL_VI_OFFSET" value="Input voltage calibration offset" />
+	  
 	  <!-- Debug related -->
 	  
 	  <Text id="IOL_DBG_PSUState" value="PSU FSM state" />
@@ -528,10 +632,16 @@
 	  
 	  <Text id="IOL_DBG_EFuseCount" value="Efuse count" />
 	  <Text id="IOL_DBG_EFuseCountDesc" value="Efuse integrator count"/>
+	  <Text id="IOL_CAL_UnlockPW" value="Calibration Unlock Password"/>
 	  
 	  <Text id="IOL_M_Process_Data" value="Process Data menu" />
 	  <Text id="IOL_M_DirectParam" value="Direct Parameter menu" />
+	  <Text id="IOL_M_Efuse_Data" value="Efuse menu" />
+	  <Text id="IOL_M_Cal_Data" value="Calibration menu" />
 	  <Text id="IOL_M_Debug_Data" value="Debug Data menu" />
+	  
+	  
+	  <Text id="IOL_ADC_SQR_T" value="ADC square t" />
     </PrimaryLanguage>
 	
   </ExternalTextCollection>
