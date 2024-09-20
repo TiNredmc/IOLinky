@@ -8,6 +8,42 @@ uint16_t Efuse_Sigma = 0;
 int16_t Efuse_Delta = 0;
 int32_t Efuse_DifferentOfSquare = 0;
 int32_t Efuse_integrator = 0;
+int32_t Efuse_threshold = THRESHOLD_EFUSE;
+
+void app_mon_applyADCCal(){
+	// Filter data first
+	psu_mondata_t.IOsense_val += psu_rawmondata_t.IOsense_raw;
+	psu_mondata_t.IOsense_val -= 
+		psu_mondata_t.IOsense_val >> 1;
+	
+	psu_mondata_t.VOsense_val += psu_rawmondata_t.VOsense_raw;
+	psu_mondata_t.VOsense_val -= 
+		psu_mondata_t.VOsense_val >> 1;
+	
+	psu_mondata_t.VIsense_val += psu_rawmondata_t.VIsense_raw;
+	psu_mondata_t.VIsense_val -= 
+		psu_mondata_t.VIsense_val >> 1;
+	
+	// Then apply the calibration 
+	psu_mondata_t.IOsense_val = (int16_t)(
+		(int32_t)(
+			((int16_t)FLASH_DATA->ADC5.ADC_SCALING *
+				psu_mondata_t.IOsense_val)
+		) >> 12) + FLASH_DATA->ADC5.ADC_OFFSET;
+	
+	psu_mondata_t.VOsense_val = (int16_t)( 
+		(int32_t)(
+			((int16_t)FLASH_DATA->ADC6.ADC_SCALING *
+				psu_mondata_t.VOsense_val)
+		)	>> 12) + FLASH_DATA->ADC6.ADC_OFFSET;
+	
+	psu_mondata_t.VIsense_val = (int16_t)(
+		(int32_t)(
+			((int16_t)FLASH_DATA->ADC7.ADC_SCALING *
+				psu_mondata_t.VIsense_val)
+		) >> 12) + FLASH_DATA->ADC7.ADC_OFFSET;
+
+}
 
 void app_mon_checkVin(){
 	// Input Undervoltage check
@@ -141,45 +177,6 @@ void app_mon_checkIout(){
 	
 }
 
-// Efuse I2t algorithm
-void app_mon_efuseRunner(){
-		
-		// Stop counting when Efuse was already tripped.
-		if(psu_mondata_t.PSU_status_b.Efuse_Trip)
-			return;
-	
-		Efuse_Sigma = 
-			psu_mondata_t.IOsense_val + 
-			THRESHOLD_IO_PEAK;
-		
-		Efuse_Delta = 
-			(int16_t)(
-			psu_mondata_t.IOsense_val -
-			THRESHOLD_IO_PEAK
-			);
-		
-		Efuse_DifferentOfSquare = 
-			(int32_t)(Efuse_Sigma * Efuse_Delta) >> 
-			10; // Divided by 1024, approximation of 1000ms
-		
-		Efuse_integrator += Efuse_DifferentOfSquare;
-		
-		// Cap lower end when current consumption
-		// returns to lower that Ipeak
-		if(Efuse_integrator < 0){
-			Efuse_integrator = 0;
-			psu_mondata_t.PSU_status_b.Efuse_Act = 0;
-			psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
-		}else{
-			psu_mondata_t.PSU_status_b.Efuse_Act = 1;
-		}
-		
-		if(Efuse_integrator > (int32_t)THRESHOLD_EFUSE){
-			psu_mondata_t.PSU_status_b.Efuse_Trip = 1;
-			psu_mondata_t.PSU_status_b.IOut_ok = 0;
-		}
-}
-
 void app_mon_efuseReset(){
 	Efuse_integrator = 0;
 	psu_mondata_t.PSU_status_b.Efuse_Act = 0;
@@ -190,8 +187,67 @@ int32_t app_mon_getEfuse(){
 	return Efuse_integrator;
 }
 
+// Efuse I2t algorithm
+void app_mon_efuseRunner(){
+		
+		// Stop counting when Efuse was already tripped.
+		if(psu_mondata_t.PSU_status_b.Efuse_Trip)
+			return;
+		
+		Efuse_Sigma = 
+			psu_mondata_t.IOsense_val + 
+			THRESHOLD_IO_I2T;
+		
+		Efuse_Delta = 
+			(int16_t)(
+			psu_mondata_t.IOsense_val -
+			THRESHOLD_IO_I2T
+			);
+		
+		Efuse_DifferentOfSquare = 
+			(int32_t)(Efuse_Sigma * Efuse_Delta) >> 
+			10; // Divided by 1024, approximation of 1000ms
+		
+		Efuse_integrator += Efuse_DifferentOfSquare;
+		
+		// Cap lower end when current consumption
+		// returns to lower that Inom
+		if(Efuse_integrator < 0){
+			Efuse_integrator = 0;
+			psu_mondata_t.PSU_status_b.Efuse_Act = 0;
+			psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
+		}else{
+			psu_mondata_t.PSU_status_b.Efuse_Act = 1;
+		}
+		
+		if(Efuse_integrator > Efuse_threshold){
+			psu_mondata_t.PSU_status_b.Efuse_Trip = 1;
+			psu_mondata_t.PSU_status_b.IOut_ok = 0;
+		}
+}
+
+void app_mon_updateEfuseThreshold(){
+	uint16_t dr = 0;
+	uint16_t e_sigma = 0;
+	int16_t e_delta = 0;
+	
+	dr = (uint16_t)FLASH_DATA->I2T_AmpHold;
+	e_sigma =
+		dr + THRESHOLD_IO_NOM;
+	
+	e_delta = 
+		(int16_t)(
+		dr - THRESHOLD_IO_NOM
+		);
+	
+	Efuse_threshold = (
+		(int32_t)(e_sigma * e_delta) >> 10
+	) * FLASH_DATA->I2T_PeriodHold;
+}
+
 void app_mon_updateMonitoring(){
 	if(adc_getDataAvaible()){
+		app_mon_applyADCCal();
 		app_mon_checkVin();
 		app_mon_checkIout();
 		app_mon_checkVout();

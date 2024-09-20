@@ -216,7 +216,6 @@ extern uint8_t *direct_param_ptr;
 // Extern for ISDU
 extern iol_isdu_t iol_iservice;
 
-extern uint8_t system_cmd;
 
 extern uint8_t dl_isdu_fsm;
 extern uint8_t ISDU_data_pointer;

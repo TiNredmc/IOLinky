@@ -17,6 +17,7 @@
 #include "iol_dl.h"
 #include "iol_al.h"
 
+#include "app_nvm.h"
 #include "app_psu.h"
 
 #define F_CPU		72000000UL

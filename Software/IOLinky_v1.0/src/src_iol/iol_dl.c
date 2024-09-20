@@ -28,7 +28,6 @@ uint8_t dl_isdu_fsm = 0;
 // DL_mode related
 uint8_t master_cmd = 0;
 uint8_t master_cycle = 0;
-uint8_t system_cmd = 0;
 
 // IO-Link comm timeout counter
 uint32_t timeout_counter = 0;

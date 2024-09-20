@@ -109,6 +109,7 @@ void iol_dl_ISDUFSM(){
 		
 		case 2:// craft the response data
 		{
+			memset(ISDU_out_buffer, 0, 67);
 			if(ISDU_RWflag == 1){
 				// Read request
 				iol_dl_craftISDURead();
@@ -147,7 +148,6 @@ void iol_dl_xorISDU(uint16_t Len){
 
 void iol_dl_craftISDURead(){
 	uint16_t isdu_idx = 0;
-	void *isdu_data_ptr;
 	
 	// Parse Index
 	if(ISDU_16bIndex == 1){
@@ -161,145 +161,13 @@ void iol_dl_craftISDURead(){
 		isdu_idx = iol_iservice.Index[0];
 	}
 	
-	memset(ISDU_out_buffer, 0, 67);
 	ISDU_out_buffer[0] = 0xD0;// Default Read Response (+) I-service;
 	
-	switch(isdu_idx){
-		case 0x0010:// Vendor Name (64 Bytes) Mandatory!
-		{
-			ISDU_data_count = strlen(isdu_device_data_t->vendor_name);
-			
-			isdu_data_ptr = isdu_device_data_t->vendor_name;			
-		}
-		break;
-		
-		case 0x0011:// Vendor Text (64 Bytes)
-		{
-			ISDU_data_count = strlen(isdu_device_data_t->vendor_text);
-			
-			isdu_data_ptr = isdu_device_data_t->vendor_text;			
-		}
-		break;
-		
-		case 0x0012:// Product Name (64 Bytes) Mandatory!
-		{
-			ISDU_data_count = strlen(isdu_device_data_t->product_name);
-			
-			isdu_data_ptr = isdu_device_data_t->product_name;
-		}
-		break;
-		
-		case 0x0013:// Product ID (64 Bytes)
-		{
-			ISDU_data_count = strlen(isdu_device_data_t->product_id);
-			
-			isdu_data_ptr = isdu_device_data_t->product_id;
-		}
-		break;
-		
-		case 0x0014:// Product Text (64 Bytes)
-		{
-			ISDU_data_count = strlen(isdu_device_data_t->product_text);
-			
-			isdu_data_ptr = isdu_device_data_t->product_text;			
-		}
-		break;
-		
-		case 0x0015:// Serial Number (16 Bytes) Mandatory!
-		{
-			ISDU_data_count = strlen(isdu_device_data_t->serial_number);
-			
-			isdu_data_ptr = isdu_device_data_t->serial_number;
-		}
-		break;
-		
-		case 0x0016:// Hardware Revision 
-		{
-			ISDU_data_count = strlen(isdu_device_data_t->hardware_revision);
-			
-			isdu_data_ptr = isdu_device_data_t->hardware_revision;
-		}
-		break;
-		
-		case 0x0017:// Firmware Revision 
-		{
-			ISDU_data_count = strlen(isdu_device_data_t->firmware_revision);
-			
-			isdu_data_ptr = isdu_device_data_t->firmware_revision;
-		}
-		break;
-		
-		case 0x0028:// Process Data input
-		{
-			ISDU_data_count = 1 + 8 + 1;// I-service + PD + checksum
-			ISDU_out_buffer[0] |= ISDU_data_count;// Length
-			ISDU_out_buffer[8] = *pdIn_ptr;
-			ISDU_out_buffer[7] = *(pdIn_ptr+1);
-			ISDU_out_buffer[6] = *(pdIn_ptr+2);
-			ISDU_out_buffer[5] = *(pdIn_ptr+3);
-			ISDU_out_buffer[4] = *(pdIn_ptr+4);
-			ISDU_out_buffer[3] = *(pdIn_ptr+5);
-			ISDU_out_buffer[2] = *(pdIn_ptr+6);
-			ISDU_out_buffer[1] = *(pdIn_ptr+7);
-			
-			goto isdu_exit;
-		}
-		break;
-		
-		case 0x00FD:// I2t Efuse integreator value
-		{
-			ISDU_data_count = 1 + 4 + 1;// I-service + Efuse data + checksum
-			int32_t efuse_temp = iol_al_getEfuseCount();
-			
-			ISDU_out_buffer[0] |= ISDU_data_count;
-			ISDU_out_buffer[1] = 
-				*(((uint8_t *)&efuse_temp) + 3);
-			ISDU_out_buffer[2] = 
-				*(((uint8_t *)&efuse_temp) + 2);
-			ISDU_out_buffer[3] = 
-				*(((uint8_t *)&efuse_temp) + 1);
-			ISDU_out_buffer[4] = 
-				*(((uint8_t *)&efuse_temp));
-			
-			goto isdu_exit;
-		}
-		
-		case 0x00FE:// PSU FSM state
-		{
-			ISDU_data_count = 1 + 1 + 1;// I-service + data + checksum
-			ISDU_out_buffer[0] |= ISDU_data_count;
-			ISDU_out_buffer[1] = iol_al_getPSUState();
-			
-			goto isdu_exit;
-		}
-			
-		default:
-			return;		
-	}
-	
-	if(ISDU_data_count < 16){
-		memcpy(
-			ISDU_out_buffer+1, 
-			isdu_data_ptr, 
-			ISDU_data_count);
-
-		ISDU_data_count += 2;// I-service + checksum;
-
-		ISDU_out_buffer[0] |= ISDU_data_count;// Length
-
-
-	}else{// Require Extlength if ISDU data is longer than 15 bytes
-		memcpy(
-			ISDU_out_buffer+2, 
-			isdu_data_ptr, 
-			ISDU_data_count);
-
-		ISDU_data_count += 3;// I-service + ExtLength + checksum
-
-		ISDU_out_buffer[0] |= 1;// Length
-		ISDU_out_buffer[1] = ISDU_data_count;
-
-	}
+	ISDU_data_count = 
+		iol_al_handleISDURead(
+			isdu_idx,
+			(uint8_t *)&ISDU_out_buffer
+		);
 	
 isdu_exit:
 	iol_dl_xorISDU(ISDU_data_count);
@@ -309,14 +177,14 @@ isdu_exit:
 void iol_dl_craftISDUWrite(){
 	uint16_t isdu_idx = 0;
 	uint8_t isdu_write_amount = 0;
-	
+	uint16_t isdu_error_ret = 0;
 	
 	// Parse Index
 	if(ISDU_16bIndex == 1){
 		// 16 Bit Index
 		isdu_idx = (uint16_t)(
-			(iol_iservice.Index[0] << 8) |
-			iol_iservice.Index[1]
+			(iol_iservice.Index[1] << 8) |
+			iol_iservice.Index[0]
 		);
 	}else{
 		// 8 bit index
@@ -332,30 +200,27 @@ void iol_dl_craftISDUWrite(){
 	ISDU_data_count = 2;
 	ISDU_out_buffer[0] = 0x50 | 2;// Default write Response (+) I-service;
 	
-	switch(isdu_idx){
-		case 0x0002:// System command
-		{
-			system_cmd = ISDU_in_buffer[ISDU_data_offset_index];
-			ISDU_data_offset_index = 0;
-		}
-		break;
-		
-		default:
-			// Preferred Index (used for vendor specific funciton)
-			if(
-				(isdu_idx > 0x0039) &&
-				(isdu_idx < 0x00FF)
-			){
-			
-			}
-		
-		
-			break;
+	isdu_error_ret = 
+		iol_al_handleISDUWrite(
+			isdu_idx,
+			(uint8_t *)&ISDU_in_buffer,
+			isdu_write_amount,
+			ISDU_data_offset_index
+		);
+	
+	if(
+		isdu_error_ret != 0
+	){
+		// If error occur, send error code
+		ISDU_data_count = 4;
+		ISDU_out_buffer[0] = 0x40 | 4;// data count including error
+		ISDU_out_buffer[1] = (uint8_t)(isdu_error_ret >> 8);
+		ISDU_out_buffer[2] = (uint8_t)isdu_error_ret;
+	
 	}
-	
-	
+
+	ISDU_data_offset_index = 0;
 	
 	// Calculate checksum
-	ISDU_out_buffer[1] = 0x00;
-	ISDU_out_buffer[1] = ISDU_out_buffer[0] ^ ISDU_out_buffer[1];
+	iol_dl_xorISDU(ISDU_data_count);
 }

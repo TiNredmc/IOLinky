@@ -11,6 +11,8 @@ uint8_t read_fifo_size 	= 0;
 // Private typedef
 l6362_mseq_len_t l6362_m_len_t;
 
+l6362_uart_handler_t *uart_pHandle_t;
+
 void l6362_init(uint8_t commode){
 	usart_initIOLink(
 		commode,

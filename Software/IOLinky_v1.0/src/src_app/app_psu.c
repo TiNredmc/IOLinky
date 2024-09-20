@@ -15,7 +15,9 @@ uint8_t buck_pwrOff_flag = 0;
 
 
 // Private typedefs
+psu_raw_t psu_rawmondata_t;
 psu_data_t psu_mondata_t;
+
 
 // Private prototype
 void app_mon_updateMonitoring();
@@ -24,8 +26,11 @@ void app_mon_efuseReset();
 void app_psu_init(){
 	// Setup ADC
 	adc_initScanDMA(
-		(uint16_t*)(&psu_mondata_t.IOsense_val)
+		(uint16_t*)(&psu_rawmondata_t.IOsense_raw)
 	);
+	
+	app_mon_updateEfuseThreshold();// Set up Efuse
+	
 	adc_softTrigger();// Initial ADC conversion
 }
 
@@ -59,8 +64,13 @@ void app_psu_powerCMD(){
 	}else if(buck_pwrOff_flag){
 		buck_pwrOff_flag = 0;// clear flag
 		app_psu_disableBuck();
+		PSU_fsm = PSU_STATE_PWROFF;
 	}
 
+}
+
+uint8_t app_psu_getPWRStatus(){
+	return (psu_mondata_t.PSU_status_b.Buck_en ? 1 : 0);
 }
 
 void app_psu_runner(){
@@ -137,7 +147,6 @@ void app_psu_runner(){
 			
 			// Check overcurrent and Efuse
 			if(
-			psu_mondata_t.PSU_status_b.IOut_ok &&
 			psu_mondata_t.PSU_status_b.IOut_OC &&
 			psu_mondata_t.PSU_status_b.Efuse_Act
 			){
@@ -145,26 +154,19 @@ void app_psu_runner(){
 				break;
 			}
 			
-			// If powered off (by IO-Link command)
-			if(!psu_mondata_t.PSU_status_b.Buck_en){
-				PSU_fsm = PSU_STATE_PWROFF;
-			}
-			
 		}
 		break;
 		
 		// State : Vout is not ok
-		// Cause : Over voltage
+		// Cause : Over voltage or Under voltage
 		case PSU_STATE_VOUT_NOK:
 		{
 			cycledelay_vout_not_ok++;
 			
 			if(
-			psu_mondata_t.PSU_status_b.VOut_ok 	&&
-			psu_mondata_t.PSU_status_b.IOut_ok	&&
-			!psu_mondata_t.PSU_status_b.IOut_SC
+			psu_mondata_t.PSU_status_b.VOut_ok 
 			){
-				cycledelay_vout_not_ok = 0;// Reset SC trip
+				cycledelay_vout_not_ok = 0;//
 				PSU_fsm = PSU_STATE_NORMAL;
 			}else{
 				// Overvoltage more than TIMEOUT_VO_OV

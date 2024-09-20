@@ -28,7 +28,7 @@ void app_initGPIO(){
 		);
 
 	GPIO_CTL(GPIOA) |= 
-		(1 << (IOL_mon * 2))		|	// IO-Link activity monitoring pin
+		//(1 << (IOL_mon * 2))			|	// IO-Link activity monitoring pin
 		(0 << (OL_pin * 2)) 			| // Input 
 		(2 << (USART2_TX * 2)) 		| // AF1
 		(2 << (USART2_RX * 2)) 		| // AF1
@@ -77,7 +77,11 @@ void app_initIO(){
 	app_initGPIO();
 	
 	timerled_init();
+	
+	app_nvm_init();
+	
 	app_psu_init();
+	
 	iol_al_init(
 	// Passing pointer to Process Data
 	(uint8_t *)&psu_mondata_t.PSU_status_w
@@ -88,7 +92,7 @@ void app_initIO(){
 void app_iol_aliveTask(){
 	if((millis() - led_millis) > PERIOD_ALIVE_TASK){
 		led_millis = millis();
-		
+
 		switch(app_psu_status()){
 			case PSU_STATE_INIT:
 			case PSU_STATE_IDLE:
@@ -120,7 +124,7 @@ void app_iol_updatePDTask(){
 void app_iol_psuRunner(){
 	if((millis() - PSU_millis) > PERIOD_PSU_TASK){
 		PSU_millis = millis();
-		app_psu_runner();
+		app_psu_runner();	
 	}
 }
 

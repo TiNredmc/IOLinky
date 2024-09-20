@@ -66,7 +66,7 @@ void usart_initIOLink(
 		
 	switch(com_mode){
 		case COM1:// 4.8 kBaud
-			USART_BAUD(USART1) |= 0x3AA0;// Wrong baud
+			USART_BAUD(USART1) |= 0x3AA0;
 			break;
 		
 		case COM2:// 38.4 kBaud
