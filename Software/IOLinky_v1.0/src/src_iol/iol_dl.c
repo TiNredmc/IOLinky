@@ -14,8 +14,6 @@ iol_mtype_0_t		iol_mt0;				// M-sequence TYPE_0 for start up
 iol_mtype_2_V_8PDI_t iol_mt2_v;
 #define MT2_V_LEN 12
 
-iol_mtype_cks_t	iol_cks_t;
-
 iol_isdu_t iol_iservice;
 
 // Private variables
@@ -57,12 +55,16 @@ uint8_t 				*pdIn_ptr;
 // Private functions
 
 void iol_dl_modeSwitcher();
-void iol_dl_modeHandler();
 
-void iol_dl_handleSTARTUP();
-void iol_dl_handlePREOPERATE();
-void iol_dl_handleOPERATE();
-
+void iol_dl_setMseq(
+	uint8_t *mseq_ptr,
+	uint8_t m_cur_mtype,
+	uint8_t m_od_pos,
+	uint8_t m_od_len,
+	uint8_t m_pdi_pos,
+	uint8_t m_pdi_len
+	);
+void iol_dl_mseqHandler();
 
 void iol_dl_ISDUFSM();
 
@@ -76,10 +78,20 @@ void iol_dl_init(
 	uint8_t pd_in_cnt
 	){
 		
-	iol_pl_updateBuffer(
-			&iol_mt0.MC,
-			&iol_mt0.OD
+	iol_pl_setMtype0();	
+	iol_pl_update_ReadBuffer(
+		&iol_mt0.MC
 	);
+	
+		
+	iol_dl_setMseq(
+				(uint8_t *)&iol_mt0.MC,
+				MSEQ_MTYPE_0,
+				2,
+				1,
+				0,
+				0
+	);	
 		
 	direct_param_ptr 		=	dev_param_1_ptr;
 	isdu_pHandler_t			=	isdu_ptrHandler_t;
@@ -98,9 +110,17 @@ void iol_dl_poll(){
 		timeout_counter = 0;
 		
 		iol_pl_setMtype0();
-		iol_pl_updateBuffer(
-			&iol_mt0.MC,
-			&iol_mt0.OD
+		iol_pl_update_ReadBuffer(
+			&iol_mt0.MC
+		);
+		
+		iol_dl_setMseq(
+				(uint8_t *)&iol_mt0.MC,
+				MSEQ_MTYPE_0,
+				2,
+				1,
+				0,
+				0
 		);
 		
 		dl_mode_fsm = DL_MODE_STARTUP;
@@ -117,12 +137,10 @@ void iol_dl_poll(){
 			if(!iol_pl_ReadAvailable())
 				break;
 			
-			timeout_counter = 0;
-			
 			dl_main_fsm = DL_MFSM_WFWR;
 			
 			// If read available. Read the data.
-			iol_dl_modeHandler();
+			iol_dl_mseqHandler();
 		}
 		break;
 
@@ -131,26 +149,9 @@ void iol_dl_poll(){
 			iol_pl_pollWrite();
 			// Wait until reply (write) is done.
 			if(iol_pl_checkWriteStatus()){
-				//GPIOB->ODR &= ~(1 << IOL_mon);
+
 				// Switch mode if necessary
 				iol_dl_modeSwitcher();
-				
-				// Make sure we are ready to reply on next cycle
-				// by updating the write buffer pointer.
-				switch(dl_mode_fsm){
-					case DL_MODE_STARTUP:
-					case DL_MODE_PREOP:
-					{
-						iol_pl_update_WriteBuffer(&iol_mt0.OD);
-					}
-					break;
-					
-					case DL_MODE_OP:
-					{
-						iol_pl_update_WriteBuffer(&iol_mt2_v.OD);
-					}
-					break;
-				}
 				
 				dl_main_fsm = DL_MFSM_PR;
 			}
@@ -172,10 +173,20 @@ void iol_dl_modeSwitcher(){
 		case 0x97:// Switch to start up mode
 		{
 			iol_pl_setMtype0();
-			iol_pl_updateBuffer(
-				&iol_mt0.MC,
-				&iol_mt0.OD
+			iol_pl_update_ReadBuffer(
+				&iol_mt0.MC
 			);
+			
+			iol_dl_setMseq(
+				(uint8_t *)&iol_mt0.MC,
+				MSEQ_MTYPE_0,
+				2,
+				1,
+				0,
+				0
+			);
+			
+			
 			dl_mode_fsm = DL_MODE_STARTUP;
 		}
 		break;
@@ -183,10 +194,19 @@ void iol_dl_modeSwitcher(){
 		case 0x99:// Switch to Operate mode
 		{
 			iol_pl_setMtype2_V_8PDI();
-			iol_pl_updateBuffer(
-				&iol_mt2_v.MC,
-				&iol_mt2_v.OD
+			iol_pl_update_ReadBuffer(
+				&iol_mt2_v.MC
 			);
+			
+			iol_dl_setMseq(
+				(uint8_t *)&iol_mt2_v.MC,
+				MSEQ_MTYPE_2,
+				2,
+				1,
+				3,
+				8
+			);
+			
 			dl_mode_fsm = DL_MODE_OP;
 		}	
 		break;
@@ -194,10 +214,19 @@ void iol_dl_modeSwitcher(){
 		case 0x9A:// Switch to Preoperate mode
 		{
 			iol_pl_setMtype0();
-			iol_pl_updateBuffer(
-				&iol_mt0.MC,
-				&iol_mt0.OD
+			iol_pl_update_ReadBuffer(
+				&iol_mt0.MC
 			);
+			
+			iol_dl_setMseq(
+				(uint8_t *)&iol_mt0.MC,
+				MSEQ_MTYPE_0,
+				2,
+				1,
+				0,
+				0
+			);
+			
 			dl_mode_fsm = DL_MODE_PREOP;
 		}
 		break;
@@ -206,35 +235,6 @@ void iol_dl_modeSwitcher(){
 			break;
 	}
 	master_cmd = 0;// Clear master cmd for receive next cmd.
-}
-
-// Mode handler is FSM that handle the M-sequence message
-// of each operating mode.
-// STARTUP mode is default to use TYPE 0 message
-// in this example code PREOPERATE mode is also use TYPE 0 message
-// but in OPERATE mode, the M-sequence message type is TYPE 2_V (8 bytes PDin data)
-void iol_dl_modeHandler(){
-
-	switch(dl_mode_fsm){
-		case DL_MODE_STARTUP:
-		{
-			iol_dl_handleSTARTUP();
-		}
-		break;
-		
-		case DL_MODE_PREOP:
-		{
-			iol_dl_handlePREOPERATE();
-		}
-		break;
-		
-		case DL_MODE_OP:
-		{
-			iol_dl_handleOPERATE();
-		}
-		break;
-	}
-	
 }
 
 // Get current DL_mode

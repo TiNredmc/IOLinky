@@ -37,7 +37,7 @@ typedef struct __attribute__((packed)){
 	union{
 		uint8_t CKT;
 		struct{
-			uint8_t CKS		:6;// Checksum
+			uint8_t CKT		:6;// Checksum
 			uint8_t MT		:2;// M-sequence type
 		}CKTBit;
 	};
@@ -67,7 +67,7 @@ typedef struct __attribute__((packed)){
 	union{
 		uint8_t CKT;
 		struct{
-			uint8_t CKS		:6;// Checksum
+			uint8_t CKT		:6;// Checksum
 			uint8_t MT		:2;// M-sequence type
 		}CKTBit;
 	};
@@ -98,7 +98,7 @@ typedef struct __attribute__((packed)){
 	union{
 		uint8_t CKT;
 		struct{
-			uint8_t CKS		:6;// Checksum
+			uint8_t CKT		:6;// Checksum
 			uint8_t MT		:2;// M-sequence type
 		}CKTBit;
 	};
@@ -133,7 +133,7 @@ typedef struct __attribute__((packed)){
 	union{
 		uint8_t CKT;
 		struct{
-			uint8_t CKS		:6;// Checksum
+			uint8_t CKT		:6;// Checksum
 			uint8_t MT		:2;// M-sequence type
 		}CKTBit;
 	};
@@ -161,21 +161,6 @@ typedef struct __attribute__((packed)){
 	};
 	
 }iol_mtype_2_V_8PDI_t;
-
-
-typedef union{
-	uint8_t CKS_B;
-	struct{
-		uint8_t CKS_0	:1;
-		uint8_t CKS_1	:1;
-		uint8_t CKS_2	:1;
-		uint8_t CKS_3	:1;
-		uint8_t CKS_4	:1;
-		uint8_t CKS_5	:1;
-		uint8_t CKS_6	:1;
-		uint8_t CKS_7	:1;
-	};
-}iol_mtype_cks_t;
 
 typedef struct{
 	union{
@@ -218,11 +203,7 @@ typedef struct{
 	
 }isdu_handler_t;
 
-// Extern for msg handler
-extern iol_mtype_0_t iol_mt0;
-extern iol_mtype_2_V_8PDI_t iol_mt2_v;
-extern iol_mtype_cks_t iol_cks_t;
-
+// Extern for msg handler 
 extern uint8_t dl_main_fsm;
 extern uint32_t timeout_counter;
 
