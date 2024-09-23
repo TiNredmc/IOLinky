@@ -569,6 +569,11 @@
               <FileType>5</FileType>
               <FilePath>.\src\src_iol\iol_sm.h</FilePath>
             </File>
+            <File>
+              <FileName>iol_dl_mseq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\src_iol\iol_dl_mseq.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
