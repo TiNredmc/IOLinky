@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "usart.h"
+#include <gd32e23x_gpio.h>
 
 typedef struct{
 	uint8_t master_data_len;
@@ -14,7 +14,7 @@ typedef struct{
 
 typedef struct{
 	void (*uart_init)(
-		uint8_t commode,
+		uint32_t baud,
 		uint8_t read_size_max,
 		uint8_t *read_ptr);
 	
@@ -22,15 +22,19 @@ typedef struct{
 	
 	void (*uart_setReadPointer)(uint8_t *read_ptr);
 	uint8_t (*uart_getReadIndex)(void);
-	uint8_t (*uart_resetReadIndex)(void);
+	void (*uart_resetReadIndex)(void);
 	
-	void (*uart_writeRequest)(
-		uint8_t count,
-		uint8_t *write_ptr);
-	uint8_t (*uart_pollWrite)(void);
+	void (*uart_enableTX)(void);
+	void (*uart_disableTX)(void);
+
+	uint8_t (*uart_getTCStatus)(void);
+	void (*uart_write)(uint8_t data);
+	
 }l6362_uart_handler_t;
 
-void l6362_init(uint8_t commode);
+void l6362_init(
+	l6362_uart_handler_t *l6362_pHandle,
+	uint32_t uart_baud);
 
 void l6362_setMseq(
 	uint8_t m_data_len,

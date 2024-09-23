@@ -1,5 +1,7 @@
 #include "usart.h"
 
+#define UART_CLK		72000000UL
+
 // Private pointers
 uint8_t *tx_ptr;
 uint8_t *rx_ptr;
@@ -45,8 +47,8 @@ void USART1_IRQHandler(void){
 }
 
 
-void usart_initIOLink(
-	uint8_t com_mode,				// IO-Link COM speed
+void usart_init(
+	uint32_t baud_rate,			// UART baud rate
 	uint8_t read_size_max,	// RX buffer size
 	uint8_t *read_ptr				// RX buffer
 	){
@@ -64,23 +66,7 @@ void usart_initIOLink(
 	USART_CTL1(USART1) |=
 		(1 << 15)			; // Swap TX and RX pin
 		
-	switch(com_mode){
-		case COM1:// 4.8 kBaud
-			USART_BAUD(USART1) |= 0x3AA0;
-			break;
-		
-		case COM2:// 38.4 kBaud
-			USART_BAUD(USART1) |= 0x0750;
-			break;
-				
-		case COM3:// 230.4 kBaud
-			USART_BAUD(USART1) |= 0x012A;
-			break;
-		
-		default:// Default at COM2
-			USART_BAUD(USART1) |= 0x0750;
-			break;
-	}
+	USART_BAUD(USART1) = 	baud_rate;
 	
 	rx_size_max = read_size_max;
 	rx_ptr = read_ptr;
@@ -101,83 +87,25 @@ void usart_setReadPtr(uint8_t *read_ptr){
 }
 
 void usart_enableTX(){
-	USART_CTL0(USART1) &= ~(1 << 2);//  Disable Receiver
+	USART_CTL0(USART1) &= ~USART_CTL0_REN;//  Disable Receiver
 	GPIO_OCTL(GPIOA) |= (1 << EN_pin);
 }
 
 void usart_disableTX(){
 	GPIO_OCTL(GPIOA) &= ~(1 << EN_pin);
-	USART_CTL0(USART1) |= (1 << 2);//  Enable Receiver
+	USART_CTL0(USART1) |= USART_CTL0_REN;//  Enable Receiver
 }
 
-void usart_writeRequest(
-	uint8_t count,
-	uint8_t *wr_ptr){
-	
-	// Passing null pointer is a no no
-	if(wr_ptr == 0)
-		return;
-	
-	// Count is 0, no write.
-	if(count == 0)
-		return;
-	
-	// Uart busy writing, request denied
-	if(uart_tx_fsm != 0)
-		return;
-	
-	tx_size = count;		
-	tx_ptr = wr_ptr;
+uint8_t usart_getTransferCompleted(){
+	return (USART_STAT(USART1) & (1 << 6)) ? 1 : 0 ;
 }
 
-uint8_t usart_pollWrite(){
-	
-	switch(uart_tx_fsm){
-		case 0:// Idle state
-		{
-			// We got write request
-			if(tx_size > 0){
-				tx_idx = 0;// reset index pointer
-				usart_enableTX();
-				uart_tx_fsm = 2;
-			}
-		}
-		break;
-		
-		case 1:// Check if TX is empty
-		{
-			if((USART_STAT(USART1) & (1 << 7)))
-					uart_tx_fsm = 2;
-		}
-		break;
-		
-		case 2:// Write to TX
-		{
-			USART_TDATA(USART1) = 
-					*(tx_ptr + tx_idx);
-				
-			tx_idx++;
-			
-			uart_tx_fsm = 3;
-		}
-		break;
-		
-		case 3:// Check transfer complete
-		{
-			if((USART_STAT(USART1) & (1 << 6))){
-				tx_size--;
-				if(tx_size == 0){
-					usart_disableTX();
-					uart_tx_fsm = 0;
-				}else{
-					uart_tx_fsm = 2;
-				}
-			}
-		}
-		break;
-	}
-	
-	return tx_size;// Return remaning
+void usart_write(uint8_t wdata){
+	USART_TDATA(USART1) = wdata;
+}
+
+void usart_writePtr(uint8_t *wdata_ptr){
+	USART_TDATA(USART1) = *wdata_ptr;
 }
 
 uint8_t usart_getReadIdx(){

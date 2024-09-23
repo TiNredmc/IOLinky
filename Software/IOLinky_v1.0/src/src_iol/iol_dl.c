@@ -48,9 +48,11 @@ uint8_t PD_In_count = 0;
 uint8_t PD_setFlag = 0;
 
 // Private pointers
-uint8_t 		*direct_param_ptr;
-isdu_data_t *isdu_device_data_t;
-uint8_t 		*pdIn_ptr;
+uint8_t 				*direct_param_ptr;
+isdu_data_t 		*isdu_device_data_t;
+isdu_handler_t 	*isdu_pHandler_t;
+uint8_t 				*pdIn_ptr;
+
 
 // Private functions
 
@@ -68,20 +70,22 @@ void iol_dl_ISDUFSM();
 // Initialize the DL (Actaully it just initialize PL)
 void iol_dl_init(
 	uint8_t *dev_param_1_ptr,
+	isdu_handler_t *isdu_ptrHandler_t,
 	isdu_data_t *isdu_data_ptr_t,
 	uint8_t *pd_in_ptr,
 	uint8_t pd_in_cnt
 	){
 		
-	iol_pl_init(
-		(uint8_t *)&iol_mt0, 
-		(uint8_t *)&iol_mt0.OD
+	iol_pl_updateBuffer(
+			&iol_mt0.MC,
+			&iol_mt0.OD
 	);
 		
-	direct_param_ptr = 	dev_param_1_ptr;
-	isdu_device_data_t = isdu_data_ptr_t;
-	pdIn_ptr = pd_in_ptr;
-	PD_In_count = pd_in_cnt;
+	direct_param_ptr 		=	dev_param_1_ptr;
+	isdu_pHandler_t			=	isdu_ptrHandler_t;
+	isdu_device_data_t 	= isdu_data_ptr_t;
+	pdIn_ptr 						= pd_in_ptr;
+	PD_In_count 				= pd_in_cnt;
 }
 	
 // Poll to receive and send IO-Link data
@@ -112,6 +116,8 @@ void iol_dl_poll(){
 			iol_pl_pollRead();
 			if(!iol_pl_ReadAvailable())
 				break;
+			
+			timeout_counter = 0;
 			
 			dl_main_fsm = DL_MFSM_WFWR;
 			

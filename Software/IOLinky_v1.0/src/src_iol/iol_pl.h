@@ -2,9 +2,27 @@
 #define IOL_PL_H
 
 #include <stdint.h>
-#include "iol_l6362.h"
 
 #include "tim0_led.h"
+
+typedef struct{
+	void (*phy_init)(void);
+	uint8_t (*phy_getParityError)(void);
+	uint8_t (*phy_readFIFO)(
+		uint8_t *read_ptr);
+	
+	uint8_t (*phy_writeFIFO)(
+		uint8_t write_count,
+		uint8_t *write_ptr
+		);
+	
+	void (*phy_setMsequenceLength)(
+		uint8_t master_data_len,
+		uint8_t master_od_len,
+		uint8_t device_od_len
+		);
+	
+}iol_pl_handler_t;
 
 enum current_mtype_e{
 	MTYPE_0 = 0,
@@ -14,8 +32,7 @@ enum current_mtype_e{
 };
 
 void iol_pl_init(
-	uint8_t *rd_buffer_ptr,
-	uint8_t *wr_buffer_ptr
+	iol_pl_handler_t *pl_pHandler_t
 	);
 
 void iol_pl_update_ReadBuffer(uint8_t *rd);

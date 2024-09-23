@@ -11,10 +11,8 @@
 #include "Systick_delay.h"
 #include "tim0_led.h"
 
-#include "iol_l6362.h"
 
-#include "iol_pl.h"
-#include "iol_dl.h"
+#include "iol_sm.h"
 #include "iol_al.h"
 
 #include "app_nvm.h"

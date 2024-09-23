@@ -5,8 +5,6 @@
 #include <string.h>
 
 #include "iol_pl.h"
-#include "iol_al.h"
-#include "gpio_pinout.h"
 
 // DL Main FSM enums
 enum DL_MAIN_FSM{
@@ -18,6 +16,12 @@ enum DL_MODE_FSM{
 	DL_MODE_STARTUP = 0,
 	DL_MODE_PREOP,
 	DL_MODE_OP
+};
+
+enum DL_MTYPE{
+	MSEQ_MTYPE_0 = 0,
+	MSEQ_MTYPE_1 = 1,
+	MSEQ_MTYPE_2 = 2
 };
 
 typedef struct __attribute__((packed)){
@@ -199,6 +203,21 @@ typedef struct __attribute__((packed)){
 	char *firmware_revision;
 }isdu_data_t;
 
+typedef struct{
+	uint16_t (*isdu_handleRead)(
+		uint16_t idx,
+		uint8_t *out_buf_ptr
+	);
+	
+	uint16_t (*isdu_handleWrite)(
+		uint16_t idx,
+		uint8_t *in_buf_ptr,
+		uint16_t write_count,
+		uint16_t data_offset
+	);
+	
+}isdu_handler_t;
+
 // Extern for msg handler
 extern iol_mtype_0_t iol_mt0;
 extern iol_mtype_2_V_8PDI_t iol_mt2_v;
@@ -214,8 +233,8 @@ extern uint8_t master_cycle;
 extern uint8_t *direct_param_ptr;
 
 // Extern for ISDU
-extern iol_isdu_t iol_iservice;
-
+extern isdu_handler_t *isdu_pHandler_t;
+extern iol_isdu_t 		iol_iservice;
 
 extern uint8_t dl_isdu_fsm;
 extern uint8_t ISDU_data_pointer;
@@ -232,6 +251,7 @@ extern uint8_t *pdIn_ptr;
 
 void iol_dl_init(
 	uint8_t *dev_param_1_ptr,
+	isdu_handler_t *isdu_ptrHandler_t,
 	isdu_data_t *isdu_data_ptr_t,
 	uint8_t *pd_in_ptr,
 	uint8_t pd_in_cnt

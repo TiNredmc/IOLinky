@@ -12,23 +12,11 @@ void app_initGPIO(){
 	RCU_AHBEN |= 
 		(1 << 17)	| // GPIOA Clock
 		(1 << 18)	; // GPIOB Clock
-	
-	// Init SPI pins
-	GPIO_CTL(GPIOA) &= 
-		~(
-		(3 << (USART2_TX * 2)) 		|
-		(3 << (USART2_RX * 2)) 		|	
-		(3 << (OL_pin * 2)) 			|
-		(3 << (EN_pin	* 2))				|
-		(3 << (Isense_pin * 2))		|	
-		(3 << (V5sense_pin * 2))	|	
-		(3 << (V24sense_pin * 2))	|
-		(3 << (RedLED_Pin * 2))		|
-		(3 << (GreenLED_Pin * 2))	
-		);
 
+	
+	// PORT-A
 	GPIO_CTL(GPIOA) |= 
-		//(1 << (IOL_mon * 2))			|	// IO-Link activity monitoring pin
+		(1 << (IOL_mon * 2))			|	// IO-Link activity monitoring pin
 		(0 << (OL_pin * 2)) 			| // Input 
 		(2 << (USART2_TX * 2)) 		| // AF1
 		(2 << (USART2_RX * 2)) 		| // AF1
@@ -45,7 +33,6 @@ void app_initGPIO(){
 		(3 << (EN_pin	* 2));			// High speed
 	
 	GPIO_PUD(GPIOA) |=
-		//(1 << (EN_pin * 2))		|	// R-pull up on the OD pin
 		(1 << (OL_pin *	2));		// R-pull up on the input pin	
 	
 	GPIO_OCTL(GPIOA) &= ~(1 << EN_pin);// Disable Transmitter
@@ -58,12 +45,7 @@ void app_initGPIO(){
 		(2 << ((RedLED_Pin - 8) * 4))		| // TIMER0 CH1
 		(2 << ((GreenLED_Pin - 8) * 4))	;	// TIMER0 CH2
 
-	// IO-Link monitoring LED
-	GPIO_CTL(GPIOB) &=
-		~(
-		(3 << (ENBuck_Pin * 2))	
-		);
-		
+	// PORT-B
 	GPIO_CTL(GPIOB) |= 
 		(1 << (ENBuck_Pin * 2))	;	// Buck converter enable pin
 
@@ -82,9 +64,9 @@ void app_initIO(){
 	
 	app_psu_init();
 	
-	iol_al_init(
-	// Passing pointer to Process Data
-	(uint8_t *)&psu_mondata_t.PSU_status_w
+	iol_sm_init(
+		COM3,
+		(uint8_t *)&psu_mondata_t.PSU_status_w
 	);
 }
 

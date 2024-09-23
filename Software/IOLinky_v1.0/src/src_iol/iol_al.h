@@ -104,7 +104,9 @@ typedef struct __attribute__((packed)){
 }device_directparam_t;
 
 void iol_al_init(
-	uint8_t *PD_data_ptr
+	device_directparam_t *d_dp_t,
+	isdu_data_t *isdu_dat_t,
+	uint8_t *PD_data_ptr	
 	);
 void iol_al_poll();
 void iol_al_updatePD();

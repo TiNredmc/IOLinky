@@ -164,7 +164,7 @@ void iol_dl_craftISDURead(){
 	ISDU_out_buffer[0] = 0xD0;// Default Read Response (+) I-service;
 	
 	ISDU_data_count = 
-		iol_al_handleISDURead(
+		isdu_pHandler_t->isdu_handleRead(
 			isdu_idx,
 			(uint8_t *)&ISDU_out_buffer
 		);
@@ -201,7 +201,7 @@ void iol_dl_craftISDUWrite(){
 	ISDU_out_buffer[0] = 0x50 | 2;// Default write Response (+) I-service;
 	
 	isdu_error_ret = 
-		iol_al_handleISDUWrite(
+		isdu_pHandler_t->isdu_handleWrite(
 			isdu_idx,
 			(uint8_t *)&ISDU_in_buffer,
 			isdu_write_amount,

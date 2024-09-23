@@ -17,16 +17,20 @@ uint8_t alive_switch_updn = 0;
 uint8_t *read_buffer_ptr;
 uint8_t *write_buffer_ptr;
 
+// Private typedef
+iol_pl_handler_t *phy_pHandler_t;
+
 // Initialize PHY, setting up data pointers
 void iol_pl_init(
-	uint8_t *rd_buffer_ptr,
-	uint8_t *wr_buffer_ptr
+	iol_pl_handler_t *pl_pHandler_t
 	){
 	
-	read_buffer_ptr = rd_buffer_ptr;	
-	write_buffer_ptr = wr_buffer_ptr;
-		
-	l6362_init(COM3);
+	if(pl_pHandler_t == 0)
+		return;
+	
+	phy_pHandler_t = pl_pHandler_t;
+
+	phy_pHandler_t->phy_init();
 		
 	// Startup with Type-0 to detect wakeup sequence
 	iol_pl_setMtype0();
@@ -101,9 +105,10 @@ void iol_pl_faultLED(){
 
 // Poll reading from the L6364
 void iol_pl_pollRead(){
-	read_available = l6362_readFIFO(read_buffer_ptr);
+	read_available = 
+		phy_pHandler_t->phy_readFIFO(read_buffer_ptr);
 	
-	if(l6362_parityChk()){
+	if(phy_pHandler_t->phy_getParityError()){
 		read_available = 0;
 	}
 }
@@ -112,8 +117,11 @@ void iol_pl_pollRead(){
 void iol_pl_pollWrite(){
 	// Data write
 	if(write_request){
-		if(l6362_writeFIFO(pl_tx_iol_byte,write_buffer_ptr) == 0)
+		if(phy_pHandler_t->phy_writeFIFO(
+				pl_tx_iol_byte,
+				write_buffer_ptr) == 0)
     {
+			// Reset write request after transfered all bytes
 		  write_request = 0;
     }
 	}
@@ -135,6 +143,7 @@ void iol_pl_WriteRequest(uint8_t count){
 }
 
 // Check writing status
+// return 1 when done
 uint8_t iol_pl_checkWriteStatus(){
 	return !write_request;
 }	
@@ -147,7 +156,7 @@ uint8_t iol_pl_getCurrentMtype(){
 
 // Set the M-seq type to TYPE_0
 void iol_pl_setMtype0(){
-	l6362_setMseq(
+	phy_pHandler_t->phy_setMsequenceLength(
 		2,
 		1,
 		1
@@ -157,7 +166,7 @@ void iol_pl_setMtype0(){
 
 // Set the M-seq type to TYPE1_2
 void iol_pl_setMtype1_2(){
-	l6362_setMseq(
+	phy_pHandler_t->phy_setMsequenceLength(
 		2,
 		2,
 		2
@@ -167,7 +176,7 @@ void iol_pl_setMtype1_2(){
 
 // Set the M-seq type to TYPE2_2
 void iol_pl_setMtype2_2(){
-	l6362_setMseq(
+	phy_pHandler_t->phy_setMsequenceLength(
 		2,
 		1,
 		1
@@ -178,7 +187,7 @@ void iol_pl_setMtype2_2(){
 // Set the M-seq type to TYPE_2_V
 // with 8 bytes PD in
 void iol_pl_setMtype2_V_8PDI(){
-	l6362_setMseq(
+	phy_pHandler_t->phy_setMsequenceLength(
 		2,
 		1,
 		1

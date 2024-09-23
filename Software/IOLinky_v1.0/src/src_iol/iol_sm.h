@@ -3,14 +3,21 @@
 
 #include <stdint.h>
 
+#include "iol_pl.h"
 #include "iol_dl.h"
 #include "iol_al.h"
 
-
-// Main FSM enum
-enum SM_MAIN_FSM{
-	SM_MAIN_INIT = 0,
-	
+enum IOL_COM_MODE{
+	COM1 = 0,
+	COM2,
+	COM3,
 };
+
+
+void iol_sm_phyInit();
+
+void iol_sm_init(
+	uint8_t commode,
+	uint8_t *pd_data_ptr);
 
 #endif

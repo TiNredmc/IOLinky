@@ -2,82 +2,27 @@
 
 #define UNIQUEID_BASE	0x1FFFF7AC
 
-// Device's direct parameter data
-device_directparam_t device_dp_t = {
-	// Page 1
-	{
-		// Master related stuff, leave it zero as default
-		.MasterCommand 							= 0,									// MasterCommand
-		.MasterCycleTime 						= 0,									// MasterCycleTime
-		
-		// Cycle time with 0.4ms time base
-		// 6.4ms + (0.4ms * Multiplier)
-		// This cycle time is 20.0ms
-		.MinCycleBit.MTMult 				= 34,	// multiplier is 34
-		.MinCycleBit.MTTimeBase			= 1,	// 0.4ms time base
-		
-		// M-Sequence Capacility
-		.MSeqPreOpCode							= PREOP_M_0,// TYPE0 in PREOPERATE mode
-		.MSeqOpCode									= OP_M_2_V8,// OPERATE : TYPE2_V 8 PDin octets
-		.MSisdu											= 1,// ISDU supported
+// Private typedef
+isdu_data_t *iol_al_isdu_d_t;
 
-		// IO-Link revision V1.1
-		.MajorRev										= 1,
-		.MinorRev										= 1,
-		
-		// Process Data In
-		.PDIByte										= 1,// PD In more than 1 byte
-		.PDISIO											= 0,// SIO mode unsupported
-		.PDIlength									= 8 - 1,// PD in 8 bytes long
-		
-		// Process Data Out -> No PD Out
-		.PDOByte										= 0,// PD Out is less than 2 bytes
-		.PDOlength									= 0,// No PD Out
-		
-		// Vendor ID
-		.VendorID										= 0xFFFF,// I wish I can have one
-		
-		// Device ID
-		.DeviceID1									= 0x12,
-		.DeviceID2									= 0x34,
-		.DeviceID3									= 0x56,
-
-		// Function ID -> Reserved for IO-Link later version
-		.FunctionID									= 0x00,
-		
-		// System command -> default startup 0x00
-		.SystemCommand							= 0x00
-	},
-	
-	// Page 2 // Device Specific profile
-	{
-		1, 2, 3, 4,
-		5, 6, 7, 8, 
-		9, 10, 11, 12, 
-		13, 14, 15, 16					
-	}
-	
-};
-
-// Mandatory String of ISDU
-isdu_data_t isdu_d_t = {
-	"KMITL",										// Vendor Name
-	"Automation Eng. KMITL", 		// Vendor Text
-	"IOLinky V1.0",							// Product name
-	"10Linky",									// Product ID
-	"Digital Buck converter",		// Product text
-	"1234ABCD",									// Serial number
-	"E230_6362",								// Hardware version
-	"E230_V1"										// Firmware version
+isdu_handler_t iol_isdu_RWHandler_t = {
+	.isdu_handleRead 	= iol_al_handleISDURead,
+	.isdu_handleWrite = iol_al_handleISDUWrite
 };
 
 // Initialize the underlying layer (AL->DL->PL)
 void iol_al_init(
+	device_directparam_t *d_dp_t,
+	isdu_data_t *isdu_dat_t,
 	uint8_t *PD_data_ptr	
 	){
+	
+	iol_al_isdu_d_t	= isdu_dat_t;
+		
 	iol_dl_init(
-		(uint8_t *)&device_dp_t,	
-		&isdu_d_t,
+		(uint8_t *)d_dp_t,	
+		&iol_isdu_RWHandler_t,
+		iol_al_isdu_d_t,
 		(uint8_t *)PD_data_ptr,
 		8			// 8 octets for TYPE2_V with 8 PD in
 	);
@@ -104,65 +49,65 @@ uint16_t iol_al_handleISDURead(
 	switch(index){
 		case 0x0010:// Vendor Name (64 Bytes) Mandatory!
 		{
-			ISDU_data_count = strlen(isdu_d_t.vendor_name);
+			ISDU_data_count = strlen(iol_al_isdu_d_t->vendor_name);
 			
-			isdu_data_ptr = isdu_d_t.vendor_name;			
+			isdu_data_ptr = iol_al_isdu_d_t->vendor_name;			
 		}
 		break;
 		
 		case 0x0011:// Vendor Text (64 Bytes)
 		{
-			ISDU_data_count = strlen(isdu_d_t.vendor_text);
+			ISDU_data_count = strlen(iol_al_isdu_d_t->vendor_text);
 			
-			isdu_data_ptr = isdu_d_t.vendor_text;			
+			isdu_data_ptr = iol_al_isdu_d_t->vendor_text;			
 		}
 		break;
 		
 		case 0x0012:// Product Name (64 Bytes) Mandatory!
 		{
-			ISDU_data_count = strlen(isdu_d_t.product_name);
+			ISDU_data_count = strlen(iol_al_isdu_d_t->product_name);
 			
-			isdu_data_ptr = isdu_d_t.product_name;
+			isdu_data_ptr = iol_al_isdu_d_t->product_name;
 		}
 		break;
 		
 		case 0x0013:// Product ID (64 Bytes)
 		{
-			ISDU_data_count = strlen(isdu_d_t.product_id);
+			ISDU_data_count = strlen(iol_al_isdu_d_t->product_id);
 			
-			isdu_data_ptr = isdu_d_t.product_id;
+			isdu_data_ptr = iol_al_isdu_d_t->product_id;
 		}
 		break;
 		
 		case 0x0014:// Product Text (64 Bytes)
 		{
-			ISDU_data_count = strlen(isdu_d_t.product_text);
+			ISDU_data_count = strlen(iol_al_isdu_d_t->product_text);
 			
-			isdu_data_ptr = isdu_d_t.product_text;			
+			isdu_data_ptr = iol_al_isdu_d_t->product_text;			
 		}
 		break;
 		
 		case 0x0015:// Serial Number (16 Bytes) Mandatory!
 		{
-			ISDU_data_count = strlen(isdu_d_t.serial_number);
+			ISDU_data_count = strlen(iol_al_isdu_d_t->serial_number);
 			
-			isdu_data_ptr = isdu_d_t.serial_number;
+			isdu_data_ptr = iol_al_isdu_d_t->serial_number;
 		}
 		break;
 		
 		case 0x0016:// Hardware Revision 
 		{
-			ISDU_data_count = strlen(isdu_d_t.hardware_revision);
+			ISDU_data_count = strlen(iol_al_isdu_d_t->hardware_revision);
 			
-			isdu_data_ptr = isdu_d_t.hardware_revision;
+			isdu_data_ptr = iol_al_isdu_d_t->hardware_revision;
 		}
 		break;
 		
 		case 0x0017:// Firmware Revision 
 		{
-			ISDU_data_count = strlen(isdu_d_t.firmware_revision);
+			ISDU_data_count = strlen(iol_al_isdu_d_t->firmware_revision);
 			
-			isdu_data_ptr = isdu_d_t.firmware_revision;
+			isdu_data_ptr = iol_al_isdu_d_t->firmware_revision;
 		}
 		break;
 		

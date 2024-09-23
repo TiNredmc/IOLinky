@@ -153,7 +153,6 @@ void iol_dl_T2VReadISDU(uint8_t address){
 		case 0x12:// FlowCTRL IDLE2 (reserved for future use, no use here for now...)	
 			// Reply with OD = 0x00
 			iol_mt2_v.OD = 0x00;
-			timeout_counter = 0;
 			dl_isdu_fsm = 0;// Went back to idle state
 			break;
 		
