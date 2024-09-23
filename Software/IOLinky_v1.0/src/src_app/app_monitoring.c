@@ -164,15 +164,14 @@ void app_mon_checkIout(){
 			psu_mondata_t.PSU_status_b.IOut_SC = 1;
 			psu_mondata_t.PSU_status_b.Efuse_Act = 1;
 			psu_mondata_t.PSU_status_b.Efuse_Trip = 1;
+		}else{
+			// In case of Output turned off
+			psu_mondata_t.PSU_status_b.IOut_ok = 0;
+			psu_mondata_t.PSU_status_b.IOut_OC = 0;
+			psu_mondata_t.PSU_status_b.IOut_SC = 0;
+			psu_mondata_t.PSU_status_b.Efuse_Act = 0;
+			psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
 		}
-//		else{
-//			// In case of Output turned off
-//			psu_mondata_t.PSU_status_b.IOut_ok = 0;
-//			psu_mondata_t.PSU_status_b.IOut_OC = 0;
-//			psu_mondata_t.PSU_status_b.IOut_SC = 0;
-//			psu_mondata_t.PSU_status_b.Efuse_Act = 0;
-//			psu_mondata_t.PSU_status_b.Efuse_Trip = 0;
-//		}
 	}
 	
 }
