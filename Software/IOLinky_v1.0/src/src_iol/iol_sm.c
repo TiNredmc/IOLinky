@@ -147,11 +147,12 @@ void iol_sm_init(
 	// Get com mode	
 	iol_commode = commode;
 		
+	iol_pl_init(&phy_l6362_pHandler_t);		
+		
 	iol_al_init(
 		&device_dp_t,
 		&isdu_d_t,
 		pd_data_ptr
 	);
 		
-	iol_pl_init(&phy_l6362_pHandler_t);	
 }
