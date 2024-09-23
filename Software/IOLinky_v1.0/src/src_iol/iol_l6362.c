@@ -69,7 +69,6 @@ uint8_t l6362_readFIFO(
 		uart_pHandle_t->uart_setReadPointer(
 			read_fifo_ptr
 		);
-		GPIO_OCTL(GPIOA) |= (1 << 0);
 	}
 		
 	if(uart_pHandle_t->uart_getReadIndex() > 0){
@@ -88,7 +87,6 @@ uint8_t l6362_readFIFO(
 			l6362_read_fifo_size){		
 			// Reset USART FIFO pointer
 			uart_pHandle_t->uart_resetReadIndex();
-			GPIO_OCTL(GPIOA) &= ~(1 << 0);
 			return l6362_read_fifo_size;
 		}
 	

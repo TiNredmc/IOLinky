@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <gd32e23x_gpio.h>
-
 typedef struct{
 	uint8_t master_data_len;
 	uint8_t master_od_len;
