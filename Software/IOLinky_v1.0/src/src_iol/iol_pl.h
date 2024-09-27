@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include "tim0_led.h"
-
 typedef struct{
 	void (*phy_init)(void);
 	uint8_t (*phy_getParityError)(void);
@@ -42,9 +40,6 @@ void iol_pl_updateBuffer(
 	uint8_t *wr_buffer_ptr
 	);
 
-void iol_pl_standbyLED();
-void iol_pl_connectedLED();
-void iol_pl_faultLED();
 void iol_pl_pollRead();
 void iol_pl_pollWrite();
 

@@ -10,8 +10,6 @@ uint8_t pl_write_fsm = 0;
 uint8_t write_request = 0;
 uint8_t read_available = 0;
 
-uint8_t alive_led = 0;
-uint8_t alive_switch_updn = 0;
 // Private pointers
 
 uint8_t *read_buffer_ptr;
@@ -53,54 +51,6 @@ void iol_pl_updateBuffer(
 	){
 	read_buffer_ptr = rd_buffer_ptr;	
 	write_buffer_ptr = wr_buffer_ptr;
-}
-
-// Run the standby LED
-void iol_pl_standbyLED(){// Red LED	
-	if(alive_led > 0x08){
-		alive_led--;
-		if(alive_led == 0x10)
-			alive_led = 0;
-	}else{
-		alive_led++;
-		if(alive_led == 0x08)
-			alive_led = 0x18;
-	}
-	
-	timerled_setRedLED(alive_led & 0x0F);
-	timerled_setGreenLED(0);
-}
-
-// Run the connected LED
-void iol_pl_connectedLED(){// Green LED
-	if(alive_led > 0x08){
-		alive_led--;
-		if(alive_led == 0x10)
-			alive_led = 0;
-	}else{
-		alive_led++;
-		if(alive_led == 0x08)
-			alive_led = 0x18;
-	}
-	
-	timerled_setRedLED(0);
-	timerled_setGreenLED(alive_led & 0x0F);
-}
-
-// Run both LED to get Yellow warning error.
-void iol_pl_faultLED(){
-	if(alive_led > 0x08){
-		alive_led--;
-		if(alive_led == 0x10)
-			alive_led = 0;
-	}else{
-		alive_led++;
-		if(alive_led == 0x08)
-			alive_led = 0x18;
-	}
-	
-	timerled_setRedLED(alive_led & 0x0F);
-	timerled_setGreenLED(alive_led & 0x0F);
 }
 
 // Poll reading from the L6364

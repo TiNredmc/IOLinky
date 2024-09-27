@@ -109,6 +109,8 @@ uint8_t l6362_writeFIFO(
 				
 			l6362_write_size = count;
 			write_fifo_ptr = input_ptr;
+		}else{
+			return 0;
 		}
 	}
 	
@@ -122,14 +124,15 @@ uint8_t l6362_pollWrite(){
 	switch(l6362_uart_tx_fsm){
 		case 0:// Idle state
 		{
+			if(l6362_write_size == 0)
+				break;
+
 			// We got write request
-			if(l6362_write_size > 0){
-				l6362_write_idx = 0;// reset index pointer
-				uart_pHandle_t->uart_enableTX();
-				l6362_uart_tx_fsm = 1;
-			}
+			l6362_write_idx = 0;// reset index pointer
+			uart_pHandle_t->uart_enableTX();
+			l6362_uart_tx_fsm = 1;
 		}
-		break;
+		// WARNING : CASE 0 FLOW THROUGH TO CASE 1 !!!
 		
 		case 1:// Write to TX
 		{

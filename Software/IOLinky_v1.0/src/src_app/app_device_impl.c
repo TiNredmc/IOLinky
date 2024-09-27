@@ -5,6 +5,8 @@ uint32_t led_millis = 0;
 uint32_t PD_refresh_millis = 0;
 uint32_t PSU_millis = 0;
 
+uint8_t alive_led = 0;
+
 // Setup all required GPIOs.
 void app_initGPIO(){
 	
@@ -12,7 +14,6 @@ void app_initGPIO(){
 	RCU_AHBEN |= 
 		(1 << 17)	| // GPIOA Clock
 		(1 << 18)	; // GPIOB Clock
-
 	
 	// PORT-A
 	GPIO_CTL(GPIOA) |= 
@@ -70,9 +71,57 @@ void app_initIO(){
 	);
 }
 
+// Run the standby LED
+void app_iol_standbyLED(){// Red LED	
+	if(alive_led > 0x08){
+		alive_led--;
+		if(alive_led == 0x10)
+			alive_led = 0;
+	}else{
+		alive_led++;
+		if(alive_led == 0x08)
+			alive_led = 0x18;
+	}
+	
+	timerled_setRedLED(alive_led & 0x0F);
+	timerled_setGreenLED(0);
+}
+
+// Run the connected LED
+void app_iol_connectedLED(){// Green LED
+	if(alive_led > 0x08){
+		alive_led--;
+		if(alive_led == 0x10)
+			alive_led = 0;
+	}else{
+		alive_led++;
+		if(alive_led == 0x08)
+			alive_led = 0x18;
+	}
+	
+	timerled_setRedLED(0);
+	timerled_setGreenLED(alive_led & 0x0F);
+}
+
+// Run both LED to get Yellow warning error.
+void app_iol_faultLED(){
+	if(alive_led > 0x08){
+		alive_led--;
+		if(alive_led == 0x10)
+			alive_led = 0;
+	}else{
+		alive_led++;
+		if(alive_led == 0x08)
+			alive_led = 0x18;
+	}
+	
+	timerled_setRedLED(alive_led & 0x0F);
+	timerled_setGreenLED(alive_led & 0x0F);
+}
+
 // alive LED status task.
 void app_iol_aliveTask(){
-	if((millis() - led_millis) > PERIOD_ALIVE_TASK){
+	if((millis() - led_millis) >= PERIOD_ALIVE_TASK){
 		led_millis = millis();
 
 		switch(app_psu_status()){
@@ -82,29 +131,29 @@ void app_iol_aliveTask(){
 			case PSU_STATE_PWROFF:
 			{
 				if(iol_dl_getModeStatus() == DL_MODE_OP){
-					iol_pl_connectedLED();
+					app_iol_connectedLED();
 				}else{
-					iol_pl_standbyLED();
+					app_iol_standbyLED();
 				}
 			}
 			break;
 			
 			default:
-				iol_pl_faultLED();
+				app_iol_faultLED();
 			break;
 		}
 	}
 }
 
 void app_iol_updatePDTask(){
-	if((millis() - PD_refresh_millis) > PERIOD_PD_TASK){
+	if((millis() - PD_refresh_millis) >= PERIOD_PD_TASK){
 		PD_refresh_millis = millis();
 		iol_al_updatePD();	
 	}
 }
 
 void app_iol_psuRunner(){
-	if((millis() - PSU_millis) > PERIOD_PSU_TASK){
+	if((millis() - PSU_millis) >= PERIOD_PSU_TASK){
 		PSU_millis = millis();
 		app_psu_runner();	
 	}
