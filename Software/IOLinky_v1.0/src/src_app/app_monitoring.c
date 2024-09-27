@@ -245,13 +245,14 @@ void app_mon_updateEfuseThreshold(){
 }
 
 void app_mon_updateMonitoring(){
-	if(adc_getDataAvaible()){
-		app_mon_applyADCCal();
-		app_mon_checkVin();
-		app_mon_checkIout();
-		app_mon_checkVout();
-		app_mon_efuseRunner();
-		
-		adc_softTrigger();// Trigger next conversion
-	}
+	if(!adc_getDataAvaible())
+		return;
+	app_mon_applyADCCal();
+	app_mon_checkVin();
+	app_mon_checkIout();
+	app_mon_checkVout();
+	app_mon_efuseRunner();
+	
+	adc_softTrigger();// Trigger next conversion
+
 }
