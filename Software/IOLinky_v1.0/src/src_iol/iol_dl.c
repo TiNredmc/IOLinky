@@ -16,6 +16,8 @@ iol_mtype_2_V_8PDI_t iol_mt2_v;
 
 iol_isdu_t iol_iservice;
 
+iol_event_t	iol_evt_t;
+
 // Private variables
 
 // DL FSMs
@@ -51,7 +53,6 @@ isdu_data_t 		*isdu_device_data_t;
 isdu_handler_t 	*isdu_pHandler_t;
 uint8_t 				*pdIn_ptr;
 
-
 // Private functions
 
 void iol_dl_modeSwitcher();
@@ -68,6 +69,7 @@ void iol_dl_mseqHandler();
 
 void iol_dl_ISDUFSM();
 
+void iol_dl_eventFSM();
 
 // Initialize the DL (Actaully it just initialize PL)
 void iol_dl_init(
@@ -85,12 +87,12 @@ void iol_dl_init(
 	
 		
 	iol_dl_setMseq(
-				(uint8_t *)&iol_mt0.MC,
-				MSEQ_MTYPE_0,
-				2,
-				1,
-				0,
-				0
+		(uint8_t *)&iol_mt0.MC,
+		MSEQ_MTYPE_0,
+		2,
+		1,
+		0,
+		0
 	);	
 		
 	direct_param_ptr 		=	dev_param_1_ptr;
@@ -115,12 +117,12 @@ void iol_dl_poll(){
 		);
 		
 		iol_dl_setMseq(
-				(uint8_t *)&iol_mt0.MC,
-				MSEQ_MTYPE_0,
-				2,
-				1,
-				0,
-				0
+			(uint8_t *)&iol_mt0.MC,
+			MSEQ_MTYPE_0,
+			2,
+			1,
+			0,
+			0
 		);
 		
 		dl_mode_fsm = DL_MODE_STARTUP;
@@ -140,7 +142,8 @@ void iol_dl_poll(){
 			dl_main_fsm = DL_MFSM_WFWR;
 			
 			// If read available. Read the data.
-			iol_dl_mseqHandler();
+			iol_dl_mseqHandler();// Takes 9us - to slow
+			
 		}
 		break;
 
@@ -149,7 +152,7 @@ void iol_dl_poll(){
 			iol_pl_pollWrite();
 			// Wait until reply (write) is done.
 			if(iol_pl_checkWriteStatus()){
-
+				
 				// Switch mode if necessary
 				iol_dl_modeSwitcher();
 				
@@ -160,6 +163,7 @@ void iol_dl_poll(){
 	}
 	
 	iol_dl_ISDUFSM();// Run the ISDU decoder FSM.
+	iol_dl_eventFSM();// Run the Events Dispatcher.
 }
 
 // DL mode switcher handle FSM of IO-Link operation mode
@@ -241,6 +245,7 @@ void iol_dl_modeSwitcher(){
 uint8_t iol_dl_getModeStatus(){
 	return dl_mode_fsm;
 }
+
 
 void iol_dl_updatePD(){
 	PD_setFlag = 1;

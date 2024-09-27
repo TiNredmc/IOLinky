@@ -20,6 +20,18 @@ enum OP_MSEQ_CODE{
 	OP_M_2_V8 = 4
 };
 
+enum EVT_TYPE{
+	EVT_NOTIFICATION	= 1,
+	EVT_WARNING				= 2,
+	EVT_ERROR					= 3
+};
+
+enum EVT_MODE{
+	EVT_SINGLE_SHOT = 1,
+	EVT_DISAPPEARS	= 2,
+	EVT_APPEARS			= 3
+};
+
 typedef struct __attribute__((packed)){
 	// Comminucation Control
 	uint8_t MasterCommand;

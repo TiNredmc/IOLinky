@@ -203,6 +203,37 @@ typedef struct{
 	
 }isdu_handler_t;
 
+typedef struct __attribute__((packed)){
+	
+	union{
+		uint8_t StatusCode;
+		struct{
+			uint8_t ActedEvt1		:1;
+			uint8_t ActedEvt2		:1;
+			uint8_t ActedEvt3		:1;
+			uint8_t ActedEvt4		:1;
+			uint8_t ActedEvt5		:1;
+			uint8_t ActedEvt6		:1;
+			uint8_t res1				:1;
+			uint8_t EvtDetails	:1;// Always 1
+		}StatusCodeBit;
+	};
+	
+	struct __attribute__((packed)){
+		union{
+			uint8_t EventQualifier;
+			struct{
+				uint8_t instant		:3;
+				uint8_t	source		:1;
+				uint8_t type			:2;
+				uint8_t mode			:2;
+			}EventQualifierBit;
+		};
+		uint16_t EventCode;
+	}EventSlot[6];
+	
+}iol_event_t;
+
 // Extern for msg handler 
 extern uint8_t dl_main_fsm;
 extern uint32_t timeout_counter;
@@ -229,6 +260,8 @@ extern uint8_t ISDU_16bIndex;
 extern isdu_data_t *isdu_device_data_t;
 extern uint8_t *pdIn_ptr;
 
+// Extern for Diagnosis event page
+extern iol_event_t	iol_evt_t;
 
 void iol_dl_init(
 	uint8_t *dev_param_1_ptr,
@@ -241,5 +274,12 @@ void iol_dl_init(
 void iol_dl_poll();
 uint8_t iol_dl_getModeStatus();
 void iol_dl_updatePD();
+
+void iol_dl_pushEvt(
+	uint8_t eventType,
+	uint16_t eventCode
+	);
+
+void iol_dl_popEvt();
 
 #endif

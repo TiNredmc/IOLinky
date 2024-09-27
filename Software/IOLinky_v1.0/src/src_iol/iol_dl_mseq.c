@@ -2,6 +2,7 @@
 
 // Private pointers
 uint8_t *mseq_message_ptr;
+uint8_t *mseq_ckt_ptr;
 uint8_t *mseq_pd_ptr;
 uint8_t *mseq_cks_ptr;
 
@@ -21,11 +22,11 @@ uint8_t mseq_reply_offset 	= 0;
 
 uint8_t m_od								= 0;
 
+uint8_t i_len 							= 0;
 
-
-uint8_t xor_odd = 0;
-uint8_t xor_even = 0;
-uint8_t xor_pair	= 0;
+uint8_t xor_odd 						= 0;
+uint8_t xor_even 						= 0;
+uint8_t xor_pair						= 0;
 
 // Private typedef
 typedef struct{
@@ -80,8 +81,7 @@ typedef union __attribute__((packed)){
 	};
 }iol_mtype_cks_t;
 
-volatile iol_mtype_cks_t iol_cks_t;
-
+iol_mtype_cks_t iol_cks_t;
 
 // Private Prototypes
 void iol_dl_mseqReadPage(uint8_t m_addr);
@@ -120,6 +120,8 @@ void iol_dl_setMseq(
 	mseq_pdin_offset		= m_pdi_pos;
 	mseq_pdin_length		= m_pdi_len;
 	
+	mseq_ckt_ptr				= mseq_message_ptr + 1;
+
 	mseq_pd_ptr 				= 
 		mseq_message_ptr		+
 		mseq_pdin_offset		;
@@ -143,12 +145,10 @@ void iol_dl_setMseq(
 
 void iol_dl_mseqHandler(){
 	// Get Msequence control
-	mseq_mc.MC	=	*(
-		mseq_message_ptr);
+	mseq_mc.MC	=	*mseq_message_ptr;
 	
 	// Get Msequence type
-	mseq_ckt.CKT = *(
-		mseq_message_ptr + 1);
+	mseq_ckt.CKT = *mseq_ckt_ptr;
 
 	// Check M-Type match
 	if(mseq_ckt.CKTBit.MT != mseq_current_mtype)
@@ -174,7 +174,6 @@ void iol_dl_mseqHandler(){
 		// Read mode -> Reply including the OD
 		mseq_reply_len = mseq_read_length;
 			
-		
 		mseq_reply_offset = mseq_od_offset;
 		
 	}else{
@@ -182,6 +181,9 @@ void iol_dl_mseqHandler(){
 		switch(mseq_mc.MCBit.CC){
 			case 1:// Page data
 				iol_dl_mseqWritePage(mseq_mc.MCBit.ADDR);
+				break;
+			case 2:// write Event
+				iol_dl_mseqWriteEvent(mseq_mc.MCBit.ADDR);
 				break;
 			case 3:// ISDU data
 				iol_dl_mseqWriteISDU(mseq_mc.MCBit.ADDR);
@@ -213,28 +215,31 @@ void iol_dl_mseqHandler(){
 		mseq_pd_ptr[1] = *(pdIn_ptr+6);
 		mseq_pd_ptr[0] = *(pdIn_ptr+7);
 	}
-	
+		
 	iol_dl_cksAssembler();
+	
 }
 
 // Handling Read request
 void iol_dl_mseqReadPage(uint8_t m_addr){
-	m_od = *(uint8_t *)
+	*(mseq_message_ptr + 
+		mseq_od_offset) = *(uint8_t *)
 			(direct_param_ptr + 
 			(m_addr & 0x1F)
 			);
-	
-	*(mseq_message_ptr + 
-		mseq_od_offset) = m_od;
 }
 
 void iol_dl_mseqReadEvent(uint8_t m_addr){
-
+	*(mseq_message_ptr + 
+		mseq_od_offset) = *(uint8_t *)
+			((uint8_t *)&iol_evt_t + 
+			(m_addr & 0x1F)
+			);
 }
 
 void iol_dl_mseqReadISDU(uint8_t m_addr){
 	uint8_t *m_od_ptr =
-		(uint8_t *)(mseq_message_ptr + 
+		(mseq_message_ptr + 
 		mseq_od_offset);
 	
 	// Grab the M-seq count
@@ -245,9 +250,8 @@ void iol_dl_mseqReadISDU(uint8_t m_addr){
 			//ISDU_data_count = 0;
 			dl_isdu_fsm = 0;// Enter Idle state
 		}
-		
 	}
-	
+
 	switch(m_addr){
 		case 0x10:// FlowCTRL START, send read respond I-service
 			if(dl_isdu_fsm < 3)
@@ -279,36 +283,32 @@ void iol_dl_mseqReadISDU(uint8_t m_addr){
 
 // Handling Write request
 void iol_dl_mseqWritePage(uint8_t m_addr){
-//	uint8_t m_od = 0;
-	m_od = *(
-		mseq_message_ptr + mseq_od_offset);
-	
 	// Store for internal use at DL
 	switch(m_addr){
 		case 0x00:
-			master_cmd = m_od;
+			master_cmd = *(
+				mseq_message_ptr + mseq_od_offset);
 			break;
 		case 0x01:
-			master_cycle = m_od;
+			master_cycle = *(
+				mseq_message_ptr + mseq_od_offset);
 			break;
 		default:
 			*(uint8_t *)(direct_param_ptr + (m_addr & 0x1F)) = 
-				m_od;
+				*(mseq_message_ptr + mseq_od_offset);
 			break;
 	}		
 }
 
 void iol_dl_mseqWriteEvent(uint8_t m_addr){
-
+	iol_dl_popEvt();
 }
 
 void iol_dl_mseqWriteISDU(uint8_t m_addr){
-	uint8_t m_od = 0;
-	m_od = *(
-		mseq_message_ptr + mseq_od_offset);
-	
+
 	if(m_addr < 0x10){
-		ISDU_in_buffer[ISDU_data_pointer] = m_od;
+		ISDU_in_buffer[ISDU_data_pointer] = *(
+			mseq_message_ptr + mseq_od_offset);;
 		
 		if(iol_iservice.length == 1)
 			ISDU_data_count = ISDU_in_buffer[1];// Grab the Extlength
@@ -324,7 +324,8 @@ void iol_dl_mseqWriteISDU(uint8_t m_addr){
 	
 	switch(m_addr){
 			case 0x10:// Get the ISDU I-service and kick FSM into decode state
-				ISDU_in_buffer[0] = m_od;
+				ISDU_in_buffer[0] = *(
+					mseq_message_ptr + mseq_od_offset);
 				iol_iservice.Iservice = ISDU_in_buffer[0];
 			
 				if(iol_iservice.length != 1)// In case of no ExtLength, we can grab the data length directly
@@ -360,7 +361,7 @@ void iol_dl_cksAssembler(){
 	*mseq_cks_ptr = mseq_cks.CKS;
 	
 	// Calculate checksum	
-	for(uint8_t i=0; i < mseq_reply_len; i++){
+	for(i_len=0; i_len < mseq_reply_len; i_len++){
 		iol_cks_t.CKS_B ^= *temp_addr;
 		temp_addr++;
 	}
@@ -386,7 +387,7 @@ void iol_dl_cksAssembler(){
 		((iol_cks_t.CKS_6 ^ iol_cks_t.CKS_7)	<< 3)	;	
 		
 	// Write to CKS buffer
-	mseq_cks.CKS = 
+	mseq_cks.CKSBit.CKS = 
 			(xor_odd 	<< 5) 		|
 			(xor_even << 4) 		|
 			(xor_pair & 0x0F)		;
