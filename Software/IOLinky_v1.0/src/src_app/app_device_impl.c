@@ -139,6 +139,7 @@ void app_iol_aliveTask(){
 			break;
 			
 			default:
+				iol_al_AppReportEvent(0x5100);
 				app_iol_faultLED();
 			break;
 		}

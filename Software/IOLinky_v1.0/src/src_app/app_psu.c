@@ -207,6 +207,12 @@ void app_psu_runner(){
 				PSU_fsm = PSU_STATE_HALT;
 			}
 			
+			if(psu_mondata_t.PSU_status_b.VIn_OV){
+				iol_al_AppReportEvent(0x5110);// Primary supply OV
+			}else if (psu_mondata_t.PSU_status_b.VIn_UV){
+				iol_al_AppReportEvent(0x5111);// Primary supply UV
+			}
+			
 		}
 		break;
 		
@@ -251,6 +257,7 @@ void app_psu_runner(){
 				if(cycledelay_sc_trip > TIMEOUT_SC){
 					cycledelay_sc_trip = 0;// Reset SC trip
 					app_psu_disableBuck();
+					iol_al_AppReportEvent(0x5101);// (E)Fuse blown
 					PSU_fsm = PSU_STATE_HALT;
 				}
 			}

@@ -5,6 +5,8 @@
 #include "gpio_pinout.h"
 #include "adc.h"
 
+#include "iol_al.h"
+
 #include "app_nvm.h"
 
 // PSU error timeout before halt
