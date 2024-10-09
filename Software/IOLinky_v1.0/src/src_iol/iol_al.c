@@ -34,9 +34,47 @@ void iol_al_poll(){
 	iol_dl_poll();
 }
 
-// Demo used to update Process Data.
+// Update Process Data.
 void iol_al_updatePD(){
 	iol_dl_updatePD();
+}
+
+void iol_al_AppReportEvent(
+	uint16_t eventCode
+	){
+	uint8_t eventType = 0;
+		
+	// Standard IO-Link Event code
+	// Only implemented if needed
+	switch(eventCode){
+		case 0x0000:// No malfunction
+			eventType = EVT_NOTIFICATION;
+			break;
+		case 0x1000:// General mulfunction 
+		case 0x4000:// Temperature fault
+		case 0x5000:// Device hardware fault
+		case 0x5010:// Component malfunction
+		case 0x5011:// NV memory loss
+		case 0x5100:// General PSU error
+		case 0x5101:// Fuse blown
+		case 0x6000:// Device Software fault
+		case 0x6320:// Parameter error
+		case 0x6321:// Parameter missing
+			eventType = EVT_ERROR;
+			break;
+		case 0x5110:// Primary supply olvervolt 
+		case 0x5111:// Primary supply undervolt
+		case 0x5112:// Sec supply fault
+		case 0x8C10:// Process data range overrun
+		case 0x8C30:// Process data underrun
+			eventType = EVT_WARNING;
+			break;
+	}
+	
+	iol_dl_pushEvt(
+		eventType,
+		eventCode
+	);
 }
 
 uint16_t iol_al_handleISDURead(
@@ -388,6 +426,7 @@ uint16_t iol_al_handleISDUWrite(
 				case 1:// Erase flash error
 				case 2:// Write flash error
 				case 3:// Verify flash error
+					iol_al_AppReportEvent(0x5000);
 					return 0x8082;// Application not ready
 				
 				default:// Update Efuse

@@ -122,6 +122,9 @@ void iol_al_init(
 	);
 void iol_al_poll();
 void iol_al_updatePD();
+void iol_al_AppReportEvent(
+	uint16_t eventCode
+	);
 
 // For ISDU
 uint16_t iol_al_handleISDURead(
