@@ -156,7 +156,6 @@ void app_mon_checkIout(){
 		}
 	}else{
 		if(
-			psu_mondata_t.PSU_status_b.Buck_en			&&
 			psu_mondata_t.IOsense_val > THRESHOLD_IO_SC){
 			// Short circuit detection
 			psu_mondata_t.PSU_status_b.IOut_ok = 0;
